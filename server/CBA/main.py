@@ -1,5 +1,5 @@
-from CBA.data_clean2 import pre_process
-from CBA.rule_generate3 import preprocess_data, split_classes_ids, CARapriori, postprocess_data
+from data_clean2 import pre_process
+from rule_generate3 import preprocess_data, split_classes_ids, CARapriori, postprocess_data
 from CBA_CG_M1 import *
 from CBA_CG_M2 import *
 import time

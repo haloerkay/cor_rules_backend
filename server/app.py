@@ -24,7 +24,7 @@ def upload_file():
         return "success"
     else:
         return 'file not uploaded'
-@app.route('/result/<file>', methods=[ 'GET'])
+@app.route('/result/cba/<file>', methods=[ 'GET'])
 def get_result(file):
     df = pd.read_csv('./dataset/'+file+'.csv')
     data = df.values.tolist()
