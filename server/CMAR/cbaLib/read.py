@@ -47,11 +47,11 @@ def str2numerical(data, value_type):
 # Main method in this file, to get data list after processing and scheme list.
 # data_path: tell where *.data file stores.
 # scheme_path: tell where *.names file stores.
-def read(data_path, scheme_path):
-    data = read_data(data_path)
-    attributes, value_type = read_scheme(scheme_path)
-    data = str2numerical(data, value_type)
-    return data, attributes, value_type
+# def read(data_path):
+#     data = read_data(data_path)
+#     attributes, value_type = read_scheme(scheme_path)
+#     data = str2numerical(data, value_type)
+#     return data, attributes, value_type
 
 
 # just for test

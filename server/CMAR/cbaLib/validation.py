@@ -8,12 +8,12 @@ Input: the relative directory path of data file and scheme file
 Output: the experimental results (similar to Table 1: Experiment Results in this paper)
 Author: CBA Studio
 """
-from cbaLib.read import read
-from cbaLib.pre_processing import pre_process
-from cbaLib.cba_rg import rule_generator
-from cbaLib.cba_cb_m1 import classifier_builder_m1
-from cbaLib.cba_cb_m1 import is_satisfy
-from cbaLib.cba_cb_m2 import classifier_builder_m2
+import pandas as pd
+from CMAR.cbaLib.pre_processing import pre_process
+from CMAR.cbaLib.cba_rg import rule_generator
+from CMAR.cbaLib.cba_cb_m1 import classifier_builder_m1
+from CMAR.cbaLib.cba_cb_m1 import is_satisfy
+from CMAR.cbaLib.cba_cb_m2 import classifier_builder_m2
 import time
 import random
 
@@ -35,8 +35,11 @@ def get_error_rate(classifier, dataset):
 
 
 # 10-fold cross-validations on CBA (M1) without pruning
-def cross_validate_m1_without_prune(data_path, scheme_path, minsup=0.01, minconf=0.5):
-    data, attributes, value_type = read(data_path, scheme_path)
+def cross_validate_m1_without_prune(data_path, minsup=0.01, minconf=0.5):
+    df = pd.read_csv(data_path)
+    data = df.values.tolist()
+    attributes = df.columns.tolist()
+    value_type = df.dtypes.iloc
     random.shuffle(data)
     dataset = pre_process(data, attributes, value_type)
 

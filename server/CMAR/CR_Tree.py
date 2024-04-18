@@ -1,19 +1,14 @@
 from __future__ import annotations
 from collections import OrderedDict
 from ordered_set import OrderedSet
-from FP_tree import DataEntry
+from CMAR.FP_Tree import DataEntry,RuleEntry
 from functools import cmp_to_key
-from FP_tree import RuleEntry
 MAXCOVERAGE = 5
-
-
-
 
 class CRTreeNode:
     """
     The CR tree node class as the element, notice that only one label should be stored in one node if confidence > 50%
     """
-
     def __init__(self, name: str, support: int, confidence: float, parent: CRTreeNode | None, label=None):
         self.name = name
         self.confidence = confidence

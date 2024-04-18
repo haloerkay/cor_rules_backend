@@ -8,7 +8,7 @@ Output: a classifier
 Author: CBA Studio
 Reference: http://www.docin.com/p-586554186.html
 """
-import cbaLib.cba_rg
+import CMAR.cbaLib.cba_rg
 from functools import cmp_to_key
 import sys
 

@@ -6,7 +6,7 @@ Output: CARs
 Author: CBA Studio
 Reference: https://www.cs.uic.edu/~hxiao/courses/cs594-slides.pdf
 """
-import cbaLib.ruleitem as ruleitem
+import CMAR.cbaLib.ruleitem as ruleitem
 
 
 class FrequentRuleitems:

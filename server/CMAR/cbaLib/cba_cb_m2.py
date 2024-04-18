@@ -9,8 +9,8 @@ Input: a set of CARs generated from rule_generator (see cab_rg.py) and a dataset
 Output: a classifier
 Author: CBA Studio
 """
-import cbaLib.ruleitem as ruleitem
-import cbaLib.cba_cb_m1
+import CMAR.cbaLib.ruleitem as ruleitem
+import CMAR.cbaLib.cba_cb_m1
 from functools import cmp_to_key
 
 

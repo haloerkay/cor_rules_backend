@@ -582,7 +582,7 @@ def test():
     n = MINSUP
     data = load_test_data()
     # initSet = fpgrowth.createInitSet(data)
-    myFPtree, myHeaderTab = createFPtree(data ,minSup=MINSUP)
+    myFPtree, myHeaderTab = createFPtree(data, minSup=MINSUP)
     myFPtree.display()
     freqItems = []
     rules = []

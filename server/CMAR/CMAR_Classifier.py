@@ -1,7 +1,6 @@
 from typing import Optional
-
-from FP_tree import RuleEntry
-from CR_Tree import DataEntry
+from CMAR.FP_Tree import RuleEntry, createFPtree, mineFPtree
+from CMAR.CR_Tree import DataEntry
 from scipy.stats import chi2_contingency
 import numpy as np
 
@@ -89,3 +88,42 @@ class CMARClassifier:
             max_chisq = CMARClassifier.max_chi_squared(precondition_count, label_count, self.dataset_size)
             sum += (chisq * chisq) / max_chisq
         return sum
+
+
+
+
+# 原main.py文件中
+def convert_data_to_dataentry(l_data, attributes):
+    items = []
+    for index, i in enumerate(l_data[:-1]):
+        item = attributes[index] + str(i)
+        items.append(item)
+    label = l_data[-1]
+    return DataEntry(items, {label:1}, 1)
+
+def get_acc(classifier, dataentries: [DataEntry]):
+    error_count = 0
+    result_counter = {}
+    for dataentry in dataentries:
+        label = [key for key in dataentry.label][0]
+        result = classifier.classify(dataentry)
+        if result in result_counter:
+            result_counter[result] += 1
+        else:
+            result_counter[result] = 1
+        result_counter[result] += 1
+        if result != label:
+            error_count += 1
+    print(result_counter)
+    print("error count is", error_count)
+    return 1 - error_count/len(dataentries)
+# get rules from dataset
+def get_rules(data, MINSUP):
+    myFPtree, myHeaderTab = createFPtree(data, {}, minSup=MINSUP)
+    print("my header_table is ", myHeaderTab)
+    myFPtree.display()
+    freqItems = []
+    rules = []
+    mineFPtree(myFPtree, myHeaderTab, MINSUP, set([]), freqItems, rules)
+    return rules
+

@@ -11,6 +11,10 @@ Author: CBA Studio
 Reference:
     1. http://cgi.csc.liv.ac.uk/~frans/KDD/Software/LUCS-KDD-DN/lucs-kdd_DN.html
 """
+from CMAR.cbaLib import rmep
+
+
+# import rmep as rmep
 
 
 # Identify the mode of a list, both effective for numerical and categorical list. When there exists too many modes
@@ -126,7 +130,7 @@ def pre_process(data, attribute, value_type):
             data_column = [x[i] for x in data]
 
         # discretization
-        if value_type[i] == 'numerical':
+        if value_type[i] == 'float64':
             discretization_data = get_discretization_data(data_column, class_column)
             block = rmep.Block(discretization_data)
             walls = rmep.partition(block)
@@ -138,7 +142,7 @@ def pre_process(data, attribute, value_type):
                 walls.append(min_value + 2 * step)
             print(attribute[i] + ":", walls)        # print out split points
             data = replace_numerical(data, i, walls)
-        elif value_type[i] == 'categorical':
+        elif value_type[i] == 'object':
             data, classes_no = replace_categorical(data, i)
             print(attribute[i] + ":", classes_no)   # print out replacement list
 
