@@ -1,6 +1,6 @@
 from typing import Optional
-from CMAR.FP_Tree import RuleEntry, createFPtree, mineFPtree
-from CMAR.CR_Tree import DataEntry
+from server.CMAR.FP_Tree import RuleEntry, createFPtree, mineFPtree
+from server.CMAR.CR_Tree import DataEntry
 from scipy.stats import chi2_contingency
 import numpy as np
 

@@ -1,6 +1,6 @@
 # from pre_procecss1 import *
 # 找出众数
-from CBA.pre_procecss1 import Block, partition, fill_missing_values
+from server.CBA.pre_procecss1 import Block, partition, fill_missing_values
 
 
 # 移除？后计算众数，

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from collections import OrderedDict
 from ordered_set import OrderedSet
-from CMAR.FP_Tree import DataEntry,RuleEntry
+from server.CMAR.FP_Tree import DataEntry,RuleEntry
 from functools import cmp_to_key
 MAXCOVERAGE = 5
 
