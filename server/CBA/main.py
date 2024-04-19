@@ -9,8 +9,6 @@ from server.CBA.data_clean2 import pre_process
 from server.CBA.rule_generate3 import preprocess_data, split_classes_ids, CARapriori, postprocess_data
 
 
-minsup = 0.01
-minconf = 0.5
 
 def get_cba_result(file):
     df = pd.read_csv('./dataset/'+file+'.csv')
@@ -24,7 +22,7 @@ def get_cba_result(file):
             d[i][j] = str("(") + str(j) + "," + str(d[i][j]) + str(")")
     d = pd.DataFrame(d)
     # 原数据70% 作为样本，随机种子为25
-    df = d.sample(frac=0.7, random_state=10)
+    df = d.sample(frac=0.7, random_state=25)
     test_df = d.drop(df.index)
     d = d.values.tolist()
     test_df = test_df.values.tolist()

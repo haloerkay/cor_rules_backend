@@ -2,13 +2,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import time
-from CBA.main import get_cba_result
+from CBA_new.main import get_cba_result
 from CMAR.main import get_cmar_result
 
-
-MINSUP = 10
-MINCONF = 0.65
-rules = []
 
 app = Flask(__name__)
 CORS(app)
@@ -27,13 +23,20 @@ def upload_file():
         return 'file not uploaded'
 
 
-@app.route('/cba/<file>', methods=[ 'GET'])
-def get_cba(file):
-  ret = get_cba_result(file)
-  return jsonify(ret)
+@app.route('/cba', methods=['POST'])
+def get_cba():
+    minsup = request.json['minsup']
+    minconf = request.json['minconf']
+    filename = request.json['filename']
+    ret = get_cba_result(minsup,minconf,filename)
+    return jsonify(ret)
+  # return ret
+  # ret = get_cba_result(file)
+  # return jsonify(ret)
 
 
-@app.route('/cmar/<file>', methods=[ 'GET'])
+
+# @app.route('/cmar/<file>', methods=['GET'])
 def get_cmar(file):
    ret = get_cmar_result(file)
    return jsonify(ret)
