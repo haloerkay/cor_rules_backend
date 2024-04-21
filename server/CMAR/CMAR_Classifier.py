@@ -6,7 +6,6 @@ import numpy as np
 
 CHISQTHRESHOLD = 0
 
-
 class CMARClassifier:
     def __init__(self, rules: [RuleEntry], default_label: str, dataset: Optional[DataEntry], dataset_size: int):
         self.rules = rules

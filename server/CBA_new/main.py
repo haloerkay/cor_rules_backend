@@ -1,5 +1,5 @@
 import pandas as pd
-
+import time
 from server.CBA.CBA_CG_M1 import is_satisfy
 from server.CBA_new.M1 import classifier_builder_m1
 from server.CBA_new.M2 import classifier_builder_m2
@@ -40,6 +40,7 @@ def get_cba_result(minsup,minconf,file):
     test_df = test_df.values.tolist()
     classLabels = pd.unique(df[len(df.columns) - 1])
     transactions, replacement_dict, inverse_dict = preprocess_data(df)
+    start = time.time()
     car = CARapriori(transactions)
     ids, classes = split_classes_ids(replacement_dict, classLabels)
     
@@ -50,7 +51,7 @@ def get_cba_result(minsup,minconf,file):
     cars = final.values.tolist()
     df = df.values.tolist()
     classifier_m1 = classifier_builder_m1(cars, df)
-    classifier_m2 = classifier_builder_m2(cars, df)
+    # classifier_m2 = classifier_builder_m2(cars, df)
     block_size = int(len(test_df) / 10)
     split_point = [k * block_size for k in range(0, 10)]
     split_point.append(len(test_df))
@@ -58,8 +59,20 @@ def get_cba_result(minsup,minconf,file):
         testt_df = d[split_point[k]:split_point[k + 1]]
         print("Accuracy", k + 1, ": ", get_accuracy(classifier_m1, testt_df))
     accuracy_m1 = get_accuracy(classifier_m1, d)
+    end = time.time()
     print("Accuracy for M1: ", accuracy_m1)
-    accuracy_m2 = get_accuracy(classifier_m2, d)
-    print("Accuracy for M2: ", accuracy_m2)
-    return [accuracy_m1, accuracy_m2]
+    cost = end - start
+    # accuracy_m2 = get_accuracy(classifier_m2, d)
+    # print("Accuracy for M2: ", accuracy_m2)
+    # return [accuracy_m1, accuracy_m2]
+    # 运行时间，准确率，类关联规则
+    return {'cost':cost, 'accuracy':accuracy_m1,'rules':classifier_m1.rule_list }
 
+def get_preprocess(file):
+    df = pd.read_csv('./dataset/' + file + '.csv')
+    data = df.values.tolist()
+    attributes = df.columns.tolist()
+    value_type = df.dtypes.iloc
+    divided = pre_process(data, attributes, value_type)
+    divided.insert(0,attributes)
+    return divided

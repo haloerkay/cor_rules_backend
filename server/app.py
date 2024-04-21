@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import time
-from CBA_new.main import get_cba_result
+from CBA_new.main import get_cba_result,get_preprocess
 from CMAR.main import get_cmar_result
 
 
@@ -22,6 +22,11 @@ def upload_file():
     else:
         return 'file not uploaded'
 
+@app.route('/pre_process/<file>', methods=['GET'])
+def get_pre_process(file):
+   ret = get_preprocess(file)
+   return jsonify(ret)
+
 
 @app.route('/cba', methods=['POST'])
 def get_cba():
@@ -35,8 +40,7 @@ def get_cba():
   # return jsonify(ret)
 
 
-
-# @app.route('/cmar/<file>', methods=['GET'])
+@app.route('/cmar/<file>', methods=['GET'])
 def get_cmar(file):
    ret = get_cmar_result(file)
    return jsonify(ret)
