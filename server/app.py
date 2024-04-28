@@ -2,8 +2,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import time
-from CBA_new.main import get_cba_result,get_preprocess
+# from CBA_new.main import get_cba_result,get_preprocess
 from CMAR.main import get_cmar_result
+from CBANB.main import cross_validate_m1_with_prune,cross_validate_m2_with_prune,get_preprocess
 
 
 app = Flask(__name__)
@@ -28,16 +29,31 @@ def get_pre_process(file):
    return jsonify(ret)
 
 
-@app.route('/cba', methods=['POST'])
-def get_cba():
+# @app.route('/cba', methods=['POST'])
+# def get_cba():
+#     minsup = request.json['minsup']
+#     minconf = request.json['minconf']
+#     filename = request.json['filename']
+#     ret = get_cba_result(minsup,minconf,filename)
+#     return jsonify(ret)
+
+@app.route('/cbam1', methods=['POST'])
+def get_cbanbm1():
     minsup = request.json['minsup']
     minconf = request.json['minconf']
     filename = request.json['filename']
-    ret = get_cba_result(minsup,minconf,filename)
+    ret = cross_validate_m1_with_prune(filename,minsup,minconf)
+    print(1)
     return jsonify(ret)
-  # return ret
-  # ret = get_cba_result(file)
-  # return jsonify(ret)
+
+@app.route('/cbam2', methods=['POST'])
+def get_cbanbm2():
+    minsup = request.json['minsup']
+    minconf = request.json['minconf']
+    filename = request.json['filename']
+    ret = cross_validate_m2_with_prune(filename,minsup,minconf)
+    print(2)
+    return jsonify(ret)
 
 
 @app.route('/cmar/<file>', methods=['GET'])

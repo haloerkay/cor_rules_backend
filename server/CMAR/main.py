@@ -1,5 +1,3 @@
-from flask import jsonify
-
 from server.CMAR.CMAR_Classifier import *
 from server.CMAR.CR_Tree import *
 from server.CMAR.FP_Tree import *
@@ -36,6 +34,7 @@ def get_cmar_result(file):
         for data in test_dataset:
             dataentry = convert_data_to_dataentry(data, attributes)
             test_dataset_to_feed.append(dataentry)
+        # MINSUP1
         rules = get_rules(train_dataset_to_feed, MINSUP)
         cr_rule_list = rules
         print('rule example is')
@@ -53,3 +52,4 @@ def get_cmar_result(file):
     acc = get_acc(classifier, test_dataset_to_feed)
     return acc
 
+# get_cmar_result('iris')

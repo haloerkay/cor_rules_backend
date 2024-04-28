@@ -218,7 +218,7 @@ class TreeNode:
                 confidence = self.labels[label] / totSum
                 # print("debug: support, conf: ", self.labels[label], confidence)
                 # print("maxcursup, maxcurconf: ", max(MINSUP, cur_maxsupport), max(MINCONF, cur_maxconf))
-                if self.labels[label] >= max(MINSUP, cur_maxsupport) and confidence >= max(MINCONF, cur_maxconf):
+                if self.labels[label]  >= max(MINSUP, cur_maxsupport) and confidence >= max(MINCONF, cur_maxconf):
                     # union 3 sets to get the full data entry that passes this node
                     # print("bug check: ", set(rootPath), {self.name}, prefix)
                     # resultRules.append(RuleEntry(set.union(set(rootPath), {self.name}, prefix), label,
@@ -366,6 +366,7 @@ def unifyTwoLabelDict(dict1: dict[str:int], dict2: dict[str:int]):
 
 
 # frequent item finding
+# MINSUP4
 def create_header_table(dataset: list[DataEntry], old_headertable, minSup=MINSUP):
     """
     the function creating and returning a header table from scratch.
@@ -386,6 +387,7 @@ def create_header_table(dataset: list[DataEntry], old_headertable, minSup=MINSUP
                     header_table[item] = [dataentry.count, old_headertable[item][0][1]]
                 else:
                     header_table[item] = [dataentry.count, index]
+    # MINSUP5
     header_table = {k: v for k, v in header_table.items() if v[0] >= minSup}
     # for k in header_table:
     #     header_table[k] = [header_table[k], None]  # element: [count, node]
@@ -400,7 +402,7 @@ def create_header_table(dataset: list[DataEntry], old_headertable, minSup=MINSUP
         ordered_header_table[entry[0]] = [entry[1], None]
     return ordered_header_table
 
-
+# MINSUP2
 def createFPtree(dataset, old_headertable, minSup=MINSUP):
     print('>>>>enter create FP tree:')
     # store headers of each item
@@ -408,6 +410,7 @@ def createFPtree(dataset, old_headertable, minSup=MINSUP):
     # if len(freq_itemset) == 0:
     #     print("No frequent itemset")
     #     return None, None
+    # MINSUP4
     header_table = create_header_table(dataset, old_headertable, minSup)
     root = TreeNode('Root', 0, None)
     for dataentry in dataset:
@@ -463,7 +466,7 @@ def findPrefixPath(item, header_table: dict[str, int | list[TreeNode | None]]):
         node = node.next  # scan next node
     return paths
 
-
+# MINSUP3
 def mineFPtree(root, header_table: dict[str, int | list[TreeNode | None]],
                minSup: int, prefix: set[str], fre_itemlist: list[set], rule_list: list[RuleEntry]):
     print("in mine tree: ordered item: ", header_table)
@@ -509,6 +512,7 @@ def mineFPtree(root, header_table: dict[str, int | list[TreeNode | None]],
         if new_root:
             print("after projection: ")
             new_root.display()
+            # MINSUP6
             mineFPtree(new_root, new_header_table, minSup, new_freq_set, fre_itemlist,
                        rule_list)  # recursively construct FP tree
         merge(fre_item, copy_head_table, root)

@@ -83,6 +83,7 @@ class CRTreeNode:
         curNode.support = rule.support
         curNode.confidence = rule.confidence
 
+
     def pruneSucessor(self, rule: RuleEntry):
         """
         the function called to prune successor nodes from this nade

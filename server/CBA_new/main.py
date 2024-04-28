@@ -20,7 +20,7 @@ def get_accuracy(classifier, dataset):
                 break
         if is_satisfy_value == False:
             error_number += 1
-    return correct_match / (error_number + correct_match)
+    return correct_match / size
 
 def get_cba_result(minsup,minconf,file):
     df = pd.read_csv('./dataset/' + file + '.csv')
