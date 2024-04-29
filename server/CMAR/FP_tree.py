@@ -1,9 +1,10 @@
 # coding:utf-8
 from __future__ import annotations
+
+import ast
 from collections import OrderedDict
 
-MINSUP = 10
-MINCONF = 0.65
+
 
 """
 header table element format:
@@ -30,10 +31,16 @@ class RuleEntry:
         self.support = support
         self.confidence = confidence
     def display(self):
-        itemStr = ''
+        # itemStr = ''
+        front = ''
         for item in self.items:
-            itemStr += str(item) + ' '
-        print(itemStr, '-> ', self.label, self.support, self.confidence)
+            # print(111,str(item))
+            # itemStr += str(item) + ' '
+            front = item
+        arr = ast.literal_eval(str([front,self.label,round(self.support,3),round(self.confidence,3)]))
+        # print(arr)
+        return arr
+        # print(itemStr, '-> ', self.label, self.support, self.confidence)
 
 
 class TreeNode:
@@ -195,7 +202,7 @@ class TreeNode:
             raise RuntimeError("retrieveAllRecordingsFromLeaf should not be called with a non-storing node.")
         return tempRecord
 
-    def retrieveRulesFromLeaf(self, prefix: set[str]) -> RuleEntry | None:
+    def retrieveRulesFromLeaf(self, prefix: set[str],minSup,minConf) -> RuleEntry | None:
         """
         the method to retrieve all the rules from the dictionary of this node.
         must be called with a storage node, otherwise throw run time error.
@@ -218,7 +225,7 @@ class TreeNode:
                 confidence = self.labels[label] / totSum
                 # print("debug: support, conf: ", self.labels[label], confidence)
                 # print("maxcursup, maxcurconf: ", max(MINSUP, cur_maxsupport), max(MINCONF, cur_maxconf))
-                if self.labels[label]  >= max(MINSUP, cur_maxsupport) and confidence >= max(MINCONF, cur_maxconf):
+                if self.labels[label]  >= max(minSup, cur_maxsupport) and confidence >= max(minConf, cur_maxconf):
                     # union 3 sets to get the full data entry that passes this node
                     # print("bug check: ", set(rootPath), {self.name}, prefix)
                     # resultRules.append(RuleEntry(set.union(set(rootPath), {self.name}, prefix), label,
@@ -259,7 +266,7 @@ def _getNodeFromTable_t(item: str, head_table: dict[str:[int, TreeNode]]) -> Tre
     else:
         print("_getNodeFromTable: unexpected item str: ", item)
 
-def projection(item: str, header_table: dict[str:[int, TreeNode]], root: TreeNode):
+def projection(item: str, header_table: dict[str:[int, TreeNode]], root: TreeNode,minSup):
     """
     the function to evaluate a projection for a given element in the head table.
     :param item: the item name to be projected.
@@ -291,7 +298,7 @@ def projection(item: str, header_table: dict[str:[int, TreeNode]], root: TreeNod
     for record in records:
         print(record.items, " -> ", record.label)
 
-    new_root, new_header_table = createFPtree(records, header_table, MINSUP)
+    new_root, new_header_table = createFPtree(records, header_table, minSup)
     for item in new_header_table:
         new_header_table[item][0][1] = header_table[item][0][1]
     return new_root, new_header_table
@@ -367,7 +374,7 @@ def unifyTwoLabelDict(dict1: dict[str:int], dict2: dict[str:int]):
 
 # frequent item finding
 # MINSUP4
-def create_header_table(dataset: list[DataEntry], old_headertable, minSup=MINSUP):
+def create_header_table(dataset: list[DataEntry], old_headertable, minSup):
     """
     the function creating and returning a header table from scratch.
     this is the only origin of all header tables.
@@ -403,7 +410,7 @@ def create_header_table(dataset: list[DataEntry], old_headertable, minSup=MINSUP
     return ordered_header_table
 
 # MINSUP2
-def createFPtree(dataset, old_headertable, minSup=MINSUP):
+def createFPtree(dataset, old_headertable, minSup):
     print('>>>>enter create FP tree:')
     # store headers of each item
     # freq_itemset = set(header_table.keys())
@@ -468,7 +475,7 @@ def findPrefixPath(item, header_table: dict[str, int | list[TreeNode | None]]):
 
 # MINSUP3
 def mineFPtree(root, header_table: dict[str, int | list[TreeNode | None]],
-               minSup: int, prefix: set[str], fre_itemlist: list[set], rule_list: list[RuleEntry]):
+               minSup: int, minConf,prefix: set[str], fre_itemlist: list[set], rule_list: list[RuleEntry]):
     print("in mine tree: ordered item: ", header_table)
 
     """
@@ -476,12 +483,12 @@ def mineFPtree(root, header_table: dict[str, int | list[TreeNode | None]],
     otherwise merge or projection should be performed on the tree.
     """
     if not root.children:
-        rule = root.retrieveRulesFromLeaf(prefix)
+        rule = root.retrieveRulesFromLeaf(prefix,minSup,minConf)
         if rule:
-            print("RRRRRRRRRRRRRRRRRRRRRRnew rule appended: ", rule.items, "->", rule.label, "sup=", rule.support,
-                  "conf=", rule.confidence)
+            # print("RRRRRRRRRRRRRRRRRRRRRRnew rule appended: ", rule.items, "->", rule.label, "sup=", rule.support,
+            #       "conf=", rule.confidence)
 
-            rule_list.append(root.retrieveRulesFromLeaf(prefix))
+            rule_list.append(root.retrieveRulesFromLeaf(prefix,minSup,minConf))
 
     copy_head_table = header_table.copy()
     """
@@ -495,12 +502,12 @@ def mineFPtree(root, header_table: dict[str, int | list[TreeNode | None]],
         cur_node = _getNodeFromTable_t(fre_item, header_table)
         # newly added to mine rules
         while cur_node is not None:
-            print("when retrieving record, curNode: ", cur_node.name, cur_node.count)
-            cur_rules = cur_node.retrieveRulesFromLeaf(prefix)
+            # print("when retrieving record, curNode: ", cur_node.name, cur_node.count)
+            cur_rules = cur_node.retrieveRulesFromLeaf(prefix,minSup,minConf)
 
-            print("cur rules: ", cur_rules)
+            # print("cur rules: ", cur_rules)
             if cur_rules:
-                print("%%%%%%%%%%%%%%%%%%%%%%new rule appended: ", cur_rules.items, "->", cur_rules.label)
+                # print("%%%%%%%%%%%%%%%%%%%%%%new rule appended: ", cur_rules.items, "->", cur_rules.label)
                 rule_list.append(cur_rules)
             cur_node = cur_node.next
         new_freq_set = prefix.copy()
@@ -508,13 +515,12 @@ def mineFPtree(root, header_table: dict[str, int | list[TreeNode | None]],
         fre_itemlist.append(new_freq_set)
         # paths = findPrefixPath(fre_item, header_table)  # find all the paths of the current item
         # new_root, new_header_table = createFPtree(paths, minSup)  # construct FP tree of the current item
-        new_root, new_header_table = projection(fre_item, copy_head_table, root)
+        new_root, new_header_table = projection(fre_item, copy_head_table, root,minSup)
         if new_root:
-            print("after projection: ")
+            # print("after projection: ")
             new_root.display()
             # MINSUP6
-            mineFPtree(new_root, new_header_table, minSup, new_freq_set, fre_itemlist,
-                       rule_list)  # recursively construct FP tree
+            mineFPtree(new_root, new_header_table, minSup,minConf,new_freq_set, fre_itemlist,rule_list)  # recursively construct FP tree
         merge(fre_item, copy_head_table, root)
 
     """
@@ -523,11 +529,11 @@ def mineFPtree(root, header_table: dict[str, int | list[TreeNode | None]],
     # the case where there's a single root remaining
     # check whether the root is a single node, if not so, there must be some problem with tree structure
     if not root.parent and not root.children and root.labels:
-        cur_rules = root.retrieveRulesFromLeaf(prefix)
+        cur_rules = root.retrieveRulesFromLeaf(prefix,minSup,minConf)
 
         print("cur rules: ", cur_rules)
         if cur_rules:
-            print("%%%%%%%%%%%%%%%%%%%%%%new rule appended: ", cur_rules.items, "->", cur_rules.label)
+            # print("%%%%%%%%%%%%%%%%%%%%%%new rule appended: ", cur_rules.items, "->", cur_rules.label)
             rule_list.append(cur_rules)
 
 
@@ -541,7 +547,7 @@ def printRules(rules: list[RuleEntry] | RuleEntry):
     for rule in rules:
         # if rule is None:
         #     continue
-        print("rule object: ", rule)
+        # print("rule object: ", rule)
         print("rule: ", rule.items, "->", rule.label, ": ", "sup: ", rule.support, "conf: ", rule.confidence)
 
 
@@ -581,21 +587,3 @@ def load_test_data():
         dataset.append(DataEntry(data[i], {labels[i]: 1}, 1))
     return dataset
 
-
-def test():
-    n = MINSUP
-    data = load_test_data()
-    # initSet = fpgrowth.createInitSet(data)
-    myFPtree, myHeaderTab = createFPtree(data, minSup=MINSUP)
-    myFPtree.display()
-    freqItems = []
-    rules = []
-    print('start')
-    mineFPtree(myFPtree, myHeaderTab, n, set([]), freqItems, rules)
-    print('end')
-    for x in freqItems:
-        print(x)
-    printRules(rules)
-
-
-# test()

@@ -115,7 +115,7 @@ def cross_validate_m1_with_prune(data_path, minsup=0.01, minconf=0.5):
         cars.prune_rules(training_dataset)
         cars.rules = cars.pruned_rules
 
-        cars.print_pruned_rule()
+        cars.print_pruned_rule(minsup, minconf)
         print(cars.all_rules)
 
         end_time = time.time()

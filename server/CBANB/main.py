@@ -25,7 +25,7 @@ def cross_validate_m1_with_prune(file, minsup, minconf):
     random.shuffle(data)
     dataset = pre_process(data, attributes, value_type)
     #     展示用
-    train_ratio = 0.7
+    train_ratio = 0.8
     train_size = int(len(dataset) * train_ratio)
     random.shuffle(dataset)
     training_dataset = dataset[:train_size]
@@ -33,24 +33,24 @@ def cross_validate_m1_with_prune(file, minsup, minconf):
 
     start_time = time.time()
     cars = rule_generator(training_dataset, minsup, minconf)
-    cars.prune_rules(training_dataset)
-    cars.rules = cars.pruned_rules
-
     classifier_m1 = classifier_builder_m1(cars, training_dataset)
     end_time = time.time()
     cost = end_time - start_time
+
+    cars.prune_rules(training_dataset)
+    cars.rules = cars.pruned_rules
     accuracy = get_accuracy(classifier_m1, test_dataset)
 
-    cars.print_pruned_rule()
+    cars.print_pruned_rule(minsup, minconf)
     all_rules = cars.all_rules
 
     return {'accuracy': accuracy, 'cost': cost,'rules': all_rules}
 
 def cross_validate_m2_with_prune(file, minsup, minconf):
     data, attributes, value_type = read('./dataset/' + file + '.csv')
-    random.shuffle(data)
+
     dataset = pre_process(data, attributes, value_type)
-    train_ratio = 0.7
+    train_ratio = 0.8
     train_size = int(len(dataset) * train_ratio)
     random.shuffle(dataset)
     training_dataset = dataset[:train_size]
@@ -58,13 +58,14 @@ def cross_validate_m2_with_prune(file, minsup, minconf):
 
     start_time = time.time()
     cars = rule_generator(training_dataset, minsup, minconf)
-    cars.prune_rules(training_dataset)
-    cars.rules = cars.pruned_rules
     classifier_m2 = classifier_builder_m2(cars, training_dataset)
     end_time = time.time()
     cost = end_time-start_time
+
+    cars.prune_rules(training_dataset)
+    cars.rules = cars.pruned_rules
     accuracy = get_accuracy(classifier_m2, test_dataset)
-    cars.print_pruned_rule()
+    cars.print_pruned_rule(minsup, minconf)
     all_rules = cars.all_rules
     return {'accuracy': accuracy, 'cost': cost,'rules': all_rules}
 def get_preprocess(file):

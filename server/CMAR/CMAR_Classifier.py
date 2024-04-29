@@ -38,10 +38,11 @@ class CMARClassifier:
                     valid_rules[rule.label] = [rule]
         # processing label and counts to find the last label
         final_label = self.default_label
+        rules = []
         for key, ruleList in valid_rules.items():
-            print(key, " rules : ")
+            # print(key, " rules : ")
             for rule in ruleList:
-                rule.display()
+                rules.append(rule.display())
         max_wchisq = 0
         for label in valid_rules:
             weighted_chisq = self.weighted_chi_square(valid_rules[label])
@@ -105,7 +106,7 @@ def get_acc(classifier, dataentries: [DataEntry]):
     result_counter = {}
     for dataentry in dataentries:
         label = [key for key in dataentry.label][0]
-        result = classifier.classify(dataentry)
+        result= classifier.classify(dataentry)
         if result in result_counter:
             result_counter[result] += 1
         else:
@@ -113,16 +114,16 @@ def get_acc(classifier, dataentries: [DataEntry]):
         result_counter[result] += 1
         if result != label:
             error_count += 1
-    print(result_counter)
-    print("error count is", error_count)
+    # print(result_counter)
+    # print("error count is", error_count)
     return 1 - error_count/len(dataentries)
 # get rules from dataset
-def get_rules(data, MINSUP):
-    myFPtree, myHeaderTab = createFPtree(data, {}, minSup=MINSUP)
-    print("my header_table is ", myHeaderTab)
+def get_rules(data, minSup,minConf):
+    myFPtree, myHeaderTab = createFPtree(data, {}, minSup)
+    # print("my header_table is ", myHeaderTab)
     myFPtree.display()
     freqItems = []
     rules = []
-    mineFPtree(myFPtree, myHeaderTab, MINSUP, set([]), freqItems, rules)
+    mineFPtree(myFPtree, myHeaderTab, minSup,minConf, set([]), freqItems, rules)
     return rules
 

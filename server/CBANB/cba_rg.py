@@ -60,10 +60,12 @@ class Car:
             # print(str(item))
 
     # print out all pruned rules
-    def print_pruned_rule(self):
+    def print_pruned_rule(self,minsup,minconf):
         for item in self.pruned_rules:
             # item.print_rule()
-            self.all_rules.append(ast.literal_eval(str(item)))
+            arr = ast.literal_eval(str(item))
+            if arr[2] > minsup and arr[3] > minconf:
+                self.all_rules.append(arr)
 
     # add a new rule (frequent & accurate), save the ruleitem with the highest confidence when having the same condset
     def _add(self, rule_item, minsup, minconf):

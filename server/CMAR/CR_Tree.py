@@ -139,6 +139,7 @@ class CRTreeNode:
             # tempRecord = DataEntry([self] + rootPath, self.labels, self.count)
             # no need self node
             rule = RuleEntry(set(rootPath), self.label, self.support, self.confidence)
+            # print(678,str(rule))
         else:
             raise RuntimeError("getRule should not be called with a non-storing node.")
         return rule
@@ -285,25 +286,3 @@ def pruneByCoverage(dataset: list[DataEntry], rules: list[RuleEntry]) -> (list[R
             max_label_count = count
             default_label = label
     return retained_rules, default_label
-
-
-def test():
-    rules = []
-    data_list = [[['a', 'b', 'c'], 'A', 80, 0.8], [['a', 'b', 'c', 'd'], 'A', 63, 0.9], [['a', 'b', 'e'], 'B', 36, 0.6],
-                 [['b', 'c', 'd'], 'C', 210, 0.7], [['a', 'b', 'c', 'e'], 'A', 60, 0.7],
-                 [['b', 'c', 'd', 'e'], 'C', 80, 0.75]]
-    for data in data_list:
-        rules.append(convert_to_rule(data))
-    # print()
-    for rule in rules:
-        rule.display()
-    root, header_table = createCRtree(rules)
-    # print(header_table)
-    root.display()
-    rules = root.getAllRules(header_table)
-    # print("result rules: ")
-    for rule in rules:
-        rule.display()
-
-
-# test()

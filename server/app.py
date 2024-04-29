@@ -56,10 +56,13 @@ def get_cbanbm2():
     return jsonify(ret)
 
 
-@app.route('/cmar/<file>', methods=['GET'])
-def get_cmar(file):
-   ret = get_cmar_result(file)
-   return jsonify(ret)
+@app.route('/cmar', methods=['POST'])
+def get_cmar():
+    minsup = request.json['minsup']
+    minconf = request.json['minconf']
+    filename = request.json['filename']
+    ret = get_cmar_result(filename,minsup,minconf)
+    return jsonify(ret)
 
 
 if __name__ == '__main__':
