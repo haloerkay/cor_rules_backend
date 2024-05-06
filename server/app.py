@@ -9,7 +9,7 @@ from CBANB.main import cross_validate_m1_with_prune,cross_validate_m2_with_prune
 
 app = Flask(__name__)
 CORS(app)
-
+app.config['preprocess'] = ''
 @app.route('/upload', methods=[ 'POST'])
 def upload_file():
     if request.method == 'POST':
@@ -36,6 +36,19 @@ def get_pre_process(file):
 #     filename = request.json['filename']
 #     ret = get_cba_result(minsup,minconf,filename)
 #     return jsonify(ret)
+def convert_sets_to_lists(obj):
+    if isinstance(obj, set):
+        return list(obj)
+    elif isinstance(obj, dict):
+        return {key: convert_sets_to_lists(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_sets_to_lists(item) for item in obj]
+    else:
+        return obj
+
+# 在函数中使用转换
+
+
 
 @app.route('/cbam1', methods=['POST'])
 def get_cbanbm1():
@@ -61,8 +74,9 @@ def get_cmar():
     minsup = request.json['minsup']
     minconf = request.json['minconf']
     filename = request.json['filename']
-    ret = get_cmar_result(filename,minsup,minconf)
-    return jsonify(ret)
+    ret = get_cmar_result(filename, minsup, minconf)
+    converted_ret = convert_sets_to_lists(ret)
+    return jsonify(converted_ret)
 
 
 if __name__ == '__main__':

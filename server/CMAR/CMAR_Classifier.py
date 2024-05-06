@@ -28,7 +28,9 @@ class CMARClassifier:
     def classify(self, record: DataEntry) -> str:
         precondition = record.items
         valid_rules = {}
+        rules = []
         for rule in self.rules:
+            rules.append([rule.items, rule.label, round(rule.support/len(self.dataset),3) , round(rule.confidence,3)])
             # if the rule matches the data
             if rule.items.issubset(precondition):
                 # add the classified label count to the dictionary
@@ -38,18 +40,19 @@ class CMARClassifier:
                     valid_rules[rule.label] = [rule]
         # processing label and counts to find the last label
         final_label = self.default_label
-        rules = []
+
         for key, ruleList in valid_rules.items():
             # print(key, " rules : ")
             for rule in ruleList:
-                rules.append(rule.display())
+                rule.display()
+
         max_wchisq = 0
         for label in valid_rules:
             weighted_chisq = self.weighted_chi_square(valid_rules[label])
             if weighted_chisq >= CHISQTHRESHOLD and weighted_chisq > max_wchisq:
                 final_label = label
                 max_wchisq = weighted_chisq
-        return final_label
+        return final_label,rules
 
     @staticmethod
     def chi_squared(precondition_count: int, label_count: int, support: int, datasize: int) -> (float, float):
@@ -106,7 +109,7 @@ def get_acc(classifier, dataentries: [DataEntry]):
     result_counter = {}
     for dataentry in dataentries:
         label = [key for key in dataentry.label][0]
-        result= classifier.classify(dataentry)
+        result, rules = classifier.classify(dataentry)
         if result in result_counter:
             result_counter[result] += 1
         else:
@@ -116,7 +119,7 @@ def get_acc(classifier, dataentries: [DataEntry]):
             error_count += 1
     # print(result_counter)
     # print("error count is", error_count)
-    return 1 - error_count/len(dataentries)
+    return 1 - error_count/len(dataentries), rules
 # get rules from dataset
 def get_rules(data, minSup,minConf):
     myFPtree, myHeaderTab = createFPtree(data, {}, minSup)

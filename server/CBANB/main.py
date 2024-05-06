@@ -19,13 +19,26 @@ def get_accuracy(classifier, dataset):
                 correct_number += 1
                 break
     return correct_number / size
+    # size = len(dataset)
+    # error_number = 0
+    # for case in dataset:
+    #     is_satisfy_value = False
+    #     for rule in classifier.rule_list:
+    #         is_satisfy_value = is_satisfy(case, rule)
+    #         print(case[-1])
+    #         if is_satisfy_value == True:
+    #             break
+    #     if is_satisfy_value == False:
+    #         if classifier.default_class != case[-1]:
+    #             error_number += 1
+    # return 1 - error_number / size
 
 def cross_validate_m1_with_prune(file, minsup, minconf):
     data, attributes, value_type = read('./dataset/' + file + '.csv')
     random.shuffle(data)
     dataset = pre_process(data, attributes, value_type)
     #     展示用
-    train_ratio = 0.8
+    train_ratio = 0.9
     train_size = int(len(dataset) * train_ratio)
     random.shuffle(dataset)
     training_dataset = dataset[:train_size]
@@ -50,7 +63,7 @@ def cross_validate_m2_with_prune(file, minsup, minconf):
     data, attributes, value_type = read('./dataset/' + file + '.csv')
 
     dataset = pre_process(data, attributes, value_type)
-    train_ratio = 0.8
+    train_ratio = 0.9
     train_size = int(len(dataset) * train_ratio)
     random.shuffle(dataset)
     training_dataset = dataset[:train_size]

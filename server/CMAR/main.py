@@ -8,15 +8,15 @@ from server.CMAR.cbaLib.validation import *
 from server.CMAR.CMAR_Classifier import get_acc
 
 def get_cmar_result(file,minSup,minConf):
-    df = pd.read_csv('./dataset/' + 'iris' + '.csv')
+    df = pd.read_csv('./dataset/' + file + '.csv')
     data = df.values.tolist()
     attributes = df.columns.tolist()
     value_type = df.dtypes.iloc
     dataset = pre_process(data, attributes, value_type)
 
-    train_ratio = 0.8
+    train_ratio = 0.9
     train_size = int(len(dataset) * train_ratio)
-    minSup = len(dataset) * minSup
+    minSup = train_size * minSup
     random.shuffle(dataset)
     training_dataset = dataset[:train_size]
     test_dataset = dataset[train_size:]
@@ -35,7 +35,7 @@ def get_cmar_result(file,minSup,minConf):
     rules = get_rules(train_dataset_to_feed, minSup,minConf)
     cr_rule_list = rules
     print('rule example is')
-    cr_rule_list[0].display()
+    # cr_rule_list[0].display()
 
     root, header_table = createCRtree(cr_rule_list)
     tree_pruned_rules = root.getAllRules(header_table)
@@ -48,8 +48,9 @@ def get_cmar_result(file,minSup,minConf):
     # print(len(test_dataset_to_feed), len(train_dataset_to_feed))
     # print('default class is', default_label)
     # print("rule number is ", len(tree_pruned_rules))
-    print(111,str(tree_pruned_rules))
-    accuracy = get_acc(classifier, test_dataset_to_feed)
-    return {'accuracy': accuracy, 'cost': cost,'rules':[[]] }
+    # print(111,str(tree_pruned_rules))
+    accuracy,rules = get_acc(classifier, test_dataset_to_feed)
+    # print( {'accuracy': accuracy, 'cost': cost,'rules':rules })
+    return {'accuracy': accuracy, 'cost': cost,'rules':rules }
 
-# get_cmar_result('iris')
+# get_cmar_result('iris',0.01,0)

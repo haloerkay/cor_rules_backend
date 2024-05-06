@@ -25,7 +25,7 @@ class DataEntry:
         print(itemStr,self.label)
 
 class RuleEntry:
-    def __init__(self, items: set[str], label: str, support: int, confidence: float):
+    def __init__(self, items, label: str, support: int, confidence: float):
         self.items = items
         self.label = label
         self.support = support
@@ -66,10 +66,10 @@ class TreeNode:
 
     def display(self, depth=1):
         # print("node ", self.name, " . display:")
-        if not self.labels:
-            print('  ' * depth, self.name + ':' + str(self.count))
-        else:
-            print('  ' * depth, self.name + ':' + str(self.count) + ' ' + str(self.labels))
+        # if not self.labels:
+            # print('  ' * depth, self.name + ':' + str(self.count))
+        # else:
+            # print('  ' * depth, self.name + ':' + str(self.count) + ' ' + str(self.labels))
         for child in self.children.values():
             child.display(depth + 1)
 
@@ -84,14 +84,14 @@ class TreeNode:
             self.children[child.name] = child
             # update parent also as find prefix path needs parent
             child.parent = self
-        else:
-            print("insertChild expects a child object, receive ", type(child), " instead")
+        # else:
+            # print("insertChild expects a child object, receive ", type(child), " instead")
 
     def removeChild(self, childName: str):
         if childName in self.children:
             self.children.pop(childName)
-        else:
-            print("unexpected child name get during _removeChild: ", childName)
+        # else:
+            # print("unexpected child name get during _removeChild: ", childName)
 
     # this is purely for testing of my interface, can choose to delete or adopt later
     def insertRecord_t(self, record: DataEntry, header_table) -> None:
@@ -112,7 +112,7 @@ class TreeNode:
         """
         if not record.items:
             unifyTwoLabelDict(self.labels, record.label)
-            print('updating root count:', self.count, record.count)
+            # print('updating root count:', self.count, record.count)
             self.count = self.count + record.count
             return
 
@@ -190,7 +190,7 @@ class TreeNode:
         must be called with a leaf node, otherwise throw runtime error.
         :return: a single record retrieved.
         """
-        print("node ", self.name, " retrieved record: ", self.labels)
+        # print("node ", self.name, " retrieved record: ", self.labels)
         rootPath = self.findRootPath()
         # if not rootPath:
         #     return None
@@ -211,8 +211,8 @@ class TreeNode:
         :return: the full list of rules from this node, or None instead (for root node).
         """
         rootPath = self.findRootPath()
-        print("node ", self.name, " retrieved rules: ", 'labels', self.labels, "with prefix: ", prefix, "and root path: ",
-              rootPath)
+        # print("node ", self.name, " retrieved rules: ", 'labels', self.labels, "with prefix: ", prefix, "and root path: ",
+        #       rootPath)
         # if not rootPath:
         #     return None
         resultRule = None
@@ -235,6 +235,7 @@ class TreeNode:
                     cur_label = label
             if cur_label is not None and cur_maxsupport != 0 and cur_maxconf != 0:
                 if self.name != 'Root':
+                    # print(rootPath,self.name,prefix,123456)
                     resultRule = RuleEntry(set.union(set(rootPath), {self.name}, prefix), cur_label,
                                            cur_maxsupport, cur_maxconf)
                 else:
@@ -243,11 +244,11 @@ class TreeNode:
 
         elif self.name != 'Root':
             raise RuntimeError("retrieveAllRulesFromLeaf should not be called with a non-storing node.")
-        if resultRule is not None:
-            print("returned: ", resultRule, "\n", resultRule.items, "->", resultRule.label,
-                  "conf = ", resultRule.confidence, "sup = ", resultRule.support)
-        else:
-            print("retunned None")
+        # if resultRule is not None:
+        #     print("returned: ", resultRule, "\n", resultRule.items, "->", resultRule.label,
+        #           "conf = ", resultRule.confidence, "sup = ", resultRule.support)
+        # else:
+        #     print("retunned None")
         return resultRule
 
 
@@ -255,16 +256,16 @@ class TreeNode:
 def _getNodeFromTable(item: str, head_table: dict[str:[int, TreeNode]]) -> TreeNode:
     if item in head_table:
         return head_table[item][1]
-    else:
-        print("_getNodeFromTable: unexpected item str: ", item)
+    # else:
+    #     print("_getNodeFromTable: unexpected item str: ", item)
 
 
 # purely for testing, temp code
 def _getNodeFromTable_t(item: str, head_table: dict[str:[int, TreeNode]]) -> TreeNode:
     if item in head_table:
         return head_table[item][1]
-    else:
-        print("_getNodeFromTable: unexpected item str: ", item)
+    # else:
+    #     print("_getNodeFromTable: unexpected item str: ", item)
 
 def projection(item: str, header_table: dict[str:[int, TreeNode]], root: TreeNode,minSup):
     """
@@ -283,8 +284,8 @@ def projection(item: str, header_table: dict[str:[int, TreeNode]], root: TreeNod
     records = []
 
     while curNode is not None:
-        print("in projection, retrieve curNode name:, its parent: ", curNode.name, curNode.parent.name,
-              "curnode label: ", curNode.labels)
+        # print("in projection, retrieve curNode name:, its parent: ", curNode.name, curNode.parent.name,
+        #       "curnode label: ", curNode.labels)
         tempRecord = None
         if curNode.labels:
             tempRecord = curNode.retrieveRecordingFromLeaf()
@@ -294,9 +295,9 @@ def projection(item: str, header_table: dict[str:[int, TreeNode]], root: TreeNod
     """
     may have this function modified to support dataEntry definition.
     """
-    print("debug: temprecord: ")
-    for record in records:
-        print(record.items, " -> ", record.label)
+    # print("debug: temprecord: ")
+    # for record in records:
+    #     print(record.items, " -> ", record.label)
 
     new_root, new_header_table = createFPtree(records, header_table, minSup)
     for item in new_header_table:
@@ -313,14 +314,14 @@ def merge(item: str, head_table: dict[str:[int, TreeNode]], root: TreeNode):
     :return: None.
     """
     curNode = _getNodeFromTable(item, head_table)
-    print(">> enter merge: merging node ", curNode.name)
+    # print(">> enter merge: merging node ", curNode.name)
     while curNode is not None:
         if curNode.children:
             raise AssertionError("the merged node must be a leaf for this implementation."
                                  "Please check either head table or tree to make sure the least support node"
                                  "is always merged first.")
         tempParent = curNode.parent
-        print("parent: ", tempParent.name, "ready to merge dicts")
+        # print("parent: ", tempParent.name, "ready to merge dicts")
         unifyTwoLabelDict(tempParent.labels, curNode.labels)
         """
         let garbage handling to handle break off node!
@@ -390,7 +391,7 @@ def create_header_table(dataset: list[DataEntry], old_headertable, minSup):
                 header_table[item][0] = count[0] + dataentry.count
             else:
                 if old_headertable:
-                    print(old_headertable)
+                    # print(old_headertable)
                     header_table[item] = [dataentry.count, old_headertable[item][0][1]]
                 else:
                     header_table[item] = [dataentry.count, index]
@@ -411,7 +412,7 @@ def create_header_table(dataset: list[DataEntry], old_headertable, minSup):
 
 # MINSUP2
 def createFPtree(dataset, old_headertable, minSup):
-    print('>>>>enter create FP tree:')
+    # print('>>>>enter create FP tree:')
     # store headers of each item
     # freq_itemset = set(header_table.keys())
     # if len(freq_itemset) == 0:
@@ -424,13 +425,9 @@ def createFPtree(dataset, old_headertable, minSup):
         # print("current dataentry: ", dataentry.items, " -> ", dataentry.label)
         counter_dict = {}
         itemset = dataentry.items
-        """
-        do not handle empty item case 
-        in this case, the item should be stored in root
-        """
         # newly added to fix this bug
         if not itemset:
-            print("debug: root insertion case")
+            # print("debug: root insertion case")
             # unifyTwoLabelDict(root.labels, dataentry.label)
             updateFPtree(dataentry, root, header_table)
 
@@ -476,7 +473,7 @@ def findPrefixPath(item, header_table: dict[str, int | list[TreeNode | None]]):
 # MINSUP3
 def mineFPtree(root, header_table: dict[str, int | list[TreeNode | None]],
                minSup: int, minConf,prefix: set[str], fre_itemlist: list[set], rule_list: list[RuleEntry]):
-    print("in mine tree: ordered item: ", header_table)
+    # print("in mine tree: ordered item: ", header_table)
 
     """
     newly added to support mining from single root node.
@@ -496,8 +493,8 @@ def mineFPtree(root, header_table: dict[str, int | list[TreeNode | None]],
         and since unvisited node is always valid, safe to ignore danging reference check
     """
     for fre_item in header_table.keys():  # for every frequent item
-        print(">>>>>>>>>>iteration for fre_item: ", fre_item, ", current tree: ")
-        print('header table is', header_table)
+        # print(">>>>>>>>>>iteration for fre_item: ", fre_item, ", current tree: ")
+        # print('header table is', header_table)
         root.display()
         cur_node = _getNodeFromTable_t(fre_item, header_table)
         # newly added to mine rules
@@ -531,59 +528,25 @@ def mineFPtree(root, header_table: dict[str, int | list[TreeNode | None]],
     if not root.parent and not root.children and root.labels:
         cur_rules = root.retrieveRulesFromLeaf(prefix,minSup,minConf)
 
-        print("cur rules: ", cur_rules)
+        # print("cur rules: ", cur_rules)
         if cur_rules:
             # print("%%%%%%%%%%%%%%%%%%%%%%new rule appended: ", cur_rules.items, "->", cur_rules.label)
             rule_list.append(cur_rules)
 
 
 def printRules(rules: list[RuleEntry] | RuleEntry):
-    print("whole view of rule object: ", rules)
+    # print("whole view of rule object: ", rules)
     if rules is None:
         return
     if isinstance(rules, RuleEntry):
-        print("rule: ", rules.items, "->", rules.label, ": ", "sup: ", rules.support, "conf: ", rules.confidence)
+        # print("rule: ", rules.items, "->", rules.label, ": ", "sup: ", rules.support, "conf: ", rules.confidence)
         return
-    for rule in rules:
+    # for rule in rules:
         # if rule is None:
         #     continue
         # print("rule object: ", rule)
-        print("rule: ", rule.items, "->", rule.label, ": ", "sup: ", rule.support, "conf: ", rule.confidence)
+        # print("rule: ", rule.items, "->", rule.label, ": ", "sup: ", rule.support, "conf: ", rule.confidence)
 
 
-def load_test_data():
-    # data = [['x', 'y', 'z'], ['x', 'y', 'z'], ['x', 'y', 'z'], ['x', 'y', 'z', 'a'], ['x', 'y', 'a'], ['x', 'z', 'a'],
-    #         ['y', 'a', 'abaaba', 'QAQ'], ['ABA', 'QAQ'], ['QAQ', 'a', 'z'], ['y', 'z', 'a'], ['y', 'z', 'a', 'QAQ']]
-    # data = [['x', 'y', 'z'], ['x', 'y', 'z'], ['x', 'y', 'z'], ['x', 'y', 'z', 'a'], ['x', 'y', 'a'], ['x', 'z', 'a']]
 
-    # labels = ['A', 'A', 'A', 'B', 'A', 'B', 'C', 'D', 'A', 'A', 'A']
-    # data = [['a1', 'b1', 'c1', 'd1'], ['a1', 'b1', 'c2', 'd2'], ['a1', 'b1', 'c1', 'd1'],
-    #         ['a2', 'b1', 'c2', 'd1'], ['a3', 'b1', 'c1', 'd1'], ['a2', 'b2', 'c2', 'd1'],
-    #
-    #         ['a3', 'b2', 'c3', 'd3'], ['a1', 'b2', 'c3', 'd3'], ['a3', 'b2', 'c2', 'd3'],
-    #         ['a2', 'b3', 'c2', 'd3'], ['a3', 'b1', 'c1', 'd3'], ['a1', 'b2', 'c2', 'd3'],
-    #
-    #         ['a1', 'b1', 'c1', 'd3'], ['a3', 'b2', 'c1', 'd1'], ['a2', 'b1', 'c3', 'd1'],
-    #         ['a3', 'b3', 'c3', 'd3'], ['a1', 'b3', 'c1', 'd3'], ['a2', 'b2', 'c2', 'd2']]
-    # labels = ['A', 'A', 'A', 'A', 'A', 'B',
-    #           'C', 'C', 'B', 'B', 'A', 'B',
-    #           'A', 'A', 'A', 'C', 'A', 'B']
-    # data = [['a1', 'b1', 'c1', 'd1'], ['a1', 'b1', 'c2', 'd2'], ['a1', 'b1', 'c1', 'd1']]
-    # labels = ['A', 'A', 'A']
-    # data = [['a1', 'b1', 'c1']] * 100 + [['a1', 'b1', 'c2']] * 150 + [['a1', 'b1', 'c3']] * 60 + \
-    #        [['a2', 'b1', 'c1']] * 100 + [['a1', 'b2', 'c1']] * 50
-    # labels = ['A'] * 80 + ['B'] * 20 + ['A'] * 150 + ['C'] * 60 + ['B'] * 100 + ['B'] * 50
-    data = [['x1', 'y1', 'z1', 'n1'], ['x1', 'y2', 'z1', 'n2'], ['x2', 'y3', 'z2', 'n3'], ['x1', 'y2', 'z3', 'n3'],
-            ['x1', 'y2', 'z1', 'n3']]
-    labels = ['A', 'B', 'A', 'B', 'A']
-    print("data: ", data)
-    print("labels: ", labels)
-    print("both var's length: ", len(data), len(labels))
-    # data = [['x1', 'y1', 'z1', 'n1'], ['x1', 'y2', 'z1', 'n2'], ['x2', 'y3', 'z2', 'n3'], ['x1', 'y2', 'z3', 'n3'],
-    #         ['x1', 'y2', 'z1', 'n3']]
-    # labels = ['A', 'B', 'A', 'B', 'A']
-    dataset = []
-    for i in range(len(data)):
-        dataset.append(DataEntry(data[i], {labels[i]: 1}, 1))
-    return dataset
 
