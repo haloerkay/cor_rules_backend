@@ -1,24 +1,6 @@
-"""
-Description: Definition of class RuleItem, including condset, class label (y in paper), condsupCount, rulesupCount,
-    support and confidence.
-Input: condset which is a set of items, class label and the dataset.
-Output: a ruleitem with its condsupCount, rulesupCount, support and confidence.
-Author: CBA Studio
-Reference: https://www.cs.uic.edu/~hxiao/courses/cs594-slides.pdf
-"""
-
 
 class RuleItem:
-    """
-    cond_set: a dict with following fashion:
-            {item name: value, item name: value, ...}
-        e.g.
-            {A: 1, B: 1} (A, B are name of columns, here called "item", and in our code should be numerical index
-                          but not string)
-    class_label: just to identify the class it belongs to.
-    dataset: a list returned by read method. (see read.py)
-    cond_sup_count, rule_sup_count, support and confidence are number.
-    """
+
     def __init__(self, cond_set, class_label, dataset):
         self.cond_set = cond_set
         self.class_label = class_label
@@ -26,8 +8,8 @@ class RuleItem:
         self.support = self._get_support(len(dataset))
         self.confidence = self._get_confidence()
 
-    def __str__(self):
-        return str([self.cond_set, self.class_label, self.support, self.confidence])
+        self.one_rule = []
+
     # calculate condsupCount and rulesupCount
     def _get_sup_count(self, dataset):
         cond_sup_count = 0
@@ -46,11 +28,12 @@ class RuleItem:
 
     # calculate support count
     def _get_support(self, dataset_size):
-        return round(self.rule_sup_count / dataset_size,3)
+        return self.rule_sup_count / dataset_size
+
     # calculate confidence
     def _get_confidence(self):
         if self.cond_sup_count != 0:
-            return round(self.rule_sup_count / self.cond_sup_count,3)
+            return self.rule_sup_count / self.cond_sup_count
         else:
             return 0
 
@@ -58,6 +41,7 @@ class RuleItem:
     def print(self):
         cond_set_output = ''
         for item in self.cond_set:
+
             cond_set_output += '(' + str(item) + ', ' + str(self.cond_set[item]) + '), '
         cond_set_output = cond_set_output[:-2]
         print('<({' + cond_set_output + '}, ' + str(self.cond_sup_count) + '), (' +
@@ -66,9 +50,14 @@ class RuleItem:
     # print out rule
     def print_rule(self):
         cond_set_output = ''
+        my_dict = {}
         for item in self.cond_set:
-            cond_set_output += '(' + str(item) + ', ' + str(self.cond_set[item]) + '), '
-        cond_set_output = '{' + cond_set_output[:-2] + '}'
-        # return [cond_set_output,str(self.class_label)]
-        print(cond_set_output + ' -> (class, ' + str(self.class_label) + ')')
+            my_dict[str(item)] = self.cond_set[item]
+            # print(item, self.cond_set[item],self.class_label,5)
+            # cond_set_output += '(' + str(item) + ', ' + str(self.cond_set[item]) + '), '
+        # cond_set_output = '{' + cond_set_output[:-2] + '}'
+        self.one_rule = [my_dict,self.class_label,round(self.support,3),round(self.confidence,3)]
+        # print(cond_set_output + ' -> (class, ' + str(self.class_label) + ')')
+
+
 

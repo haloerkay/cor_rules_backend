@@ -38,7 +38,7 @@ def cross_validate_m1_with_prune(file, minsup, minconf):
     random.shuffle(data)
     dataset = pre_process(data, attributes, value_type)
     #     展示用
-    train_ratio = 0.9
+    train_ratio = 0.8
     train_size = int(len(dataset) * train_ratio)
     random.shuffle(dataset)
     training_dataset = dataset[:train_size]
@@ -63,7 +63,7 @@ def cross_validate_m2_with_prune(file, minsup, minconf):
     data, attributes, value_type = read('./dataset/' + file + '.csv')
 
     dataset = pre_process(data, attributes, value_type)
-    train_ratio = 0.9
+    train_ratio = 0.8
     train_size = int(len(dataset) * train_ratio)
     random.shuffle(dataset)
     training_dataset = dataset[:train_size]

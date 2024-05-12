@@ -5,7 +5,7 @@ import time
 # from CBA_new.main import get_cba_result,get_preprocess
 from CMAR.main import get_cmar_result
 from CBANB.main import cross_validate_m1_with_prune,cross_validate_m2_with_prune,get_preprocess
-
+from server.APR.main import apr
 
 app = Flask(__name__)
 CORS(app)
@@ -51,16 +51,22 @@ def convert_sets_to_lists(obj):
 
 
 @app.route('/cbam1', methods=['POST'])
-def get_cbanbm1():
+def get_cbam1():
     minsup = request.json['minsup']
     minconf = request.json['minconf']
     filename = request.json['filename']
     ret = cross_validate_m1_with_prune(filename,minsup,minconf)
-    print(1)
+    return jsonify(ret)
+@app.route('/cbaapr', methods=['POST'])
+def get_cbaapr():
+    minsup = request.json['minsup']
+    minconf = request.json['minconf']
+    filename = request.json['filename']
+    ret = apr(filename,minsup,minconf)
     return jsonify(ret)
 
 @app.route('/cbam2', methods=['POST'])
-def get_cbanbm2():
+def get_cbam2():
     minsup = request.json['minsup']
     minconf = request.json['minconf']
     filename = request.json['filename']
