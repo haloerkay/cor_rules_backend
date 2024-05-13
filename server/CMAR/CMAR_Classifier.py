@@ -25,12 +25,11 @@ class CMARClassifier:
                 else:
                     self.dataset_label_count[label] = 1
 
-    def classify(self, record: DataEntry) -> str:
+    def classify(self, record: DataEntry,attributes):
         precondition = record.items
         valid_rules = {}
         rules = []
         for rule in self.rules:
-            rules.append([rule.items, rule.label, round(rule.support/len(self.dataset),3) , round(rule.confidence,3)])
             # if the rule matches the data
             if rule.items.issubset(precondition):
                 # add the classified label count to the dictionary
@@ -44,6 +43,19 @@ class CMARClassifier:
         for key, ruleList in valid_rules.items():
             # print(key, " rules : ")
             for rule in ruleList:
+                index_map = {value: index for index, value in enumerate(attributes)}
+                modified_values = {}
+                # 遍历第二个数组
+                for value in rule.items:
+                    # 获取在第一个数组中的索引
+                    index = index_map.get(value[:-1], None)
+                    # 如果找到了索引，则修改对应的值
+                    if index is not None:
+                        modified_values[index] = int(value[-1])
+                    rules.append([modified_values, rule.label, round(rule.support / len(self.dataset), 3),
+                                  round(rule.confidence, 3)])
+
+
                 rule.display()
 
         max_wchisq = 0
@@ -104,12 +116,12 @@ def convert_data_to_dataentry(l_data, attributes):
     label = l_data[-1]
     return DataEntry(items, {label:1}, 1)
 
-def get_acc(classifier, dataentries: [DataEntry]):
+def get_acc(classifier, dataentries: [DataEntry],attributes):
     error_count = 0
     result_counter = {}
     for dataentry in dataentries:
         label = [key for key in dataentry.label][0]
-        result, rules = classifier.classify(dataentry)
+        result, rules = classifier.classify(dataentry,attributes)
         if result in result_counter:
             result_counter[result] += 1
         else:

@@ -37,6 +37,9 @@ class Classifier:
         self._error_list = list()
         self._default_class_list = list()
 
+        self.all_rules = []
+
+
     # insert a rule into rule_list, then choose a default class, and calculate the errors (see line 8, 10 & 11)
     def insert(self, rule, dataset):
         self.rule_list.append(rule)             # insert r at the end of C
@@ -93,6 +96,7 @@ class Classifier:
     def print(self):
         for rule in self.rule_list:
             rule.print_rule()
+            self.all_rules.append(rule.one_rule)
         print("default_class:", self.default_class)
 
 

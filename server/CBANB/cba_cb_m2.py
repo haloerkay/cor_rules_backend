@@ -31,6 +31,7 @@ class Classifier_m2:
         self._default_class_list.append(default_class)
         self._total_errors_list.append(total_errors)
 
+        self.all_rules = []
     # discard those rules that introduce more errors. See line 18-20, CBA-CB: M2 (Stage 3).
     def discard(self):
         index = self._total_errors_list.index(min(self._total_errors_list))
@@ -44,6 +45,7 @@ class Classifier_m2:
     def print(self):
         for rule in self.rule_list:
             rule.print_rule()
+            self.all_rules.append(rule.one_rule)
         print("default_class:", self.default_class)
 
 

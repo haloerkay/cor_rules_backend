@@ -14,6 +14,7 @@ def get_cmar_result(file,minSup,minConf):
     value_type = df.dtypes.iloc
     dataset = pre_process(data, attributes, value_type)
 
+    print(attributes)
     train_ratio = 0.9
     train_size = int(len(dataset) * train_ratio)
     minSup = train_size * minSup
@@ -49,7 +50,8 @@ def get_cmar_result(file,minSup,minConf):
     # print('default class is', default_label)
     # print("rule number is ", len(tree_pruned_rules))
     # print(111,str(tree_pruned_rules))
-    accuracy,rules = get_acc(classifier, test_dataset_to_feed)
+    accuracy,rules = get_acc(classifier, test_dataset_to_feed,attributes)
+    # index_map = {value: index for index, value in enumerate(array1)}
     # print( {'accuracy': accuracy, 'cost': cost,'rules':rules })
     return {'accuracy': accuracy, 'cost': cost,'rules':rules }
 

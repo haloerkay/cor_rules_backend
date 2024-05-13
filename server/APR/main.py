@@ -54,11 +54,10 @@ def apr(file, minsup, minconf):
     # 在classifier的for循环中得到完整的二维数组（all_rules）
     # 这个函数不能删，用于的到结果classifier.all_rules
     classifier.print()
-
     accuracy = get_accuracy(classifier,test_dataset)
     # print(res,classifier.all_rules,cost)
 
-    return {'accuracy': accuracy, 'cost': cost, 'rules': classifier.all_rules}
+    return {'accuracy': accuracy, 'cost': cost, 'rules': classifier.all_rules,'default':classifier.default_class}
 
 
 

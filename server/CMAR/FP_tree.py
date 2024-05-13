@@ -18,10 +18,14 @@ class DataEntry:
         self.label = label
         self.count = count
 
+
+
     def display(self):
         itemStr = ''
         for item in self.items:
             itemStr += str(item) + ' '
+            # arr = [item,self.label]
+            # self.one_rule.append(arr)
         print(itemStr,self.label)
 
 class RuleEntry:
@@ -37,8 +41,8 @@ class RuleEntry:
             # print(111,str(item))
             # itemStr += str(item) + ' '
             front = item
-        arr = ast.literal_eval(str([front,self.label,round(self.support,3),round(self.confidence,3)]))
-        # print(arr)
+        arr = [front,self.label,round(self.support,3),round(self.confidence,3)]
+        print(arr,123)
         return arr
         # print(itemStr, '-> ', self.label, self.support, self.confidence)
 

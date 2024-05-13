@@ -52,11 +52,12 @@ def cross_validate_m1_with_prune(file, minsup, minconf):
 
     cars.prune_rules(training_dataset)
     cars.rules = cars.pruned_rules
+    classifier_m1.print()
     accuracy = get_accuracy(classifier_m1, test_dataset)
 
     cars.print_pruned_rule(minsup, minconf)
-    all_rules = cars.all_rules
-
+    # all_rules = cars.all_rules
+    all_rules = classifier_m1.all_rules
     return {'accuracy': accuracy, 'cost': cost,'rules': all_rules}
 
 def cross_validate_m2_with_prune(file, minsup, minconf):
@@ -77,9 +78,13 @@ def cross_validate_m2_with_prune(file, minsup, minconf):
 
     cars.prune_rules(training_dataset)
     cars.rules = cars.pruned_rules
+    classifier_m2.print()
+
     accuracy = get_accuracy(classifier_m2, test_dataset)
     cars.print_pruned_rule(minsup, minconf)
-    all_rules = cars.all_rules
+    # all_rules = cars.all_rules
+    all_rules = classifier_m2.all_rules
+
     return {'accuracy': accuracy, 'cost': cost,'rules': all_rules}
 def get_preprocess(file):
     df = pd.read_csv('./dataset/' + file + '.csv')

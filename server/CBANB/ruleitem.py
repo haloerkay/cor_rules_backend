@@ -26,6 +26,9 @@ class RuleItem:
         self.support = self._get_support(len(dataset))
         self.confidence = self._get_confidence()
 
+        self.one_rule=[]
+
+
     def __str__(self):
         return str([self.cond_set, self.class_label, self.support, self.confidence])
     # calculate condsupCount and rulesupCount
@@ -66,9 +69,13 @@ class RuleItem:
     # print out rule
     def print_rule(self):
         cond_set_output = ''
+        my_dict = {}
         for item in self.cond_set:
             cond_set_output += '(' + str(item) + ', ' + str(self.cond_set[item]) + '), '
-        cond_set_output = '{' + cond_set_output[:-2] + '}'
+            my_dict[str(item)] = self.cond_set[item]
+
+        # cond_set_output = '{' + cond_set_output[:-2] + '}'
         # return [cond_set_output,str(self.class_label)]
-        print(cond_set_output + ' -> (class, ' + str(self.class_label) + ')')
+        self.one_rule = [my_dict, self.class_label, round(self.support, 3), round(self.confidence, 3)]
+        # print(cond_set_output + ' -> (class, ' + str(self.class_label) + ')')
 
