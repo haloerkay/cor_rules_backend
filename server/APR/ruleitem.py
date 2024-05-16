@@ -10,6 +10,7 @@ class RuleItem:
 
         self.one_rule = []
 
+
     # calculate condsupCount and rulesupCount
     def _get_sup_count(self, dataset):
         cond_sup_count = 0

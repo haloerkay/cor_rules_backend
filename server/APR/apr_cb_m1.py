@@ -166,6 +166,7 @@ def classifier_builder_m1(cars, dataset,min_support,length,u):
             classifier.insert(rule,dataset)
 
             # print(dataset)
+            #
             temp_arp=list(cars_list)
             for i in range(len(cars_list)):
                 cars_list[i].cond_sup_count, cars_list[i].rule_sup_count = cars_list[i]._get_sup_count(dataset)
