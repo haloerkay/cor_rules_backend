@@ -120,11 +120,9 @@ def cross_validate_m1_without_prune(data_path, scheme_path,class_first=False, mi
 
             for j in T[i]:
                 u.append(j)
-        # print([u[i].cond_set for i in range(len(u))])
         apr_rg_total_runtime += apr_rg_runtime
 
         start_time = time.time()
-        # print("----------")
         classifier= classifier_builder_m1(cars, training_dataset,minsup,len(training_dataset),u)
 
 

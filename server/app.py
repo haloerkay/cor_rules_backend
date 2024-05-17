@@ -3,9 +3,9 @@ from flask_cors import CORS
 import os
 import time
 # from CBA_new.main import get_cba_result,get_preprocess
-from CMAR.main import get_cmar_result
-from CBANB.main import cross_validate_m1_with_prune,cross_validate_m2_with_prune,get_preprocess
-from server.APR.main import apr
+from CMAR.main import get_cmar_result,cross_validate_cmar
+from CBANB.main import cba_m1_prune,cba_m2_prune,get_preprocess,cross_validate_m1,cross_validate_m2
+from server.APR.main import apr,cross_validate_apr
 
 app = Flask(__name__)
 CORS(app)
@@ -48,14 +48,12 @@ def convert_sets_to_lists(obj):
 
 # 在函数中使用转换
 
-
-
 @app.route('/cbam1', methods=['POST'])
 def get_cbam1():
     minsup = request.json['minsup']
     minconf = request.json['minconf']
     filename = request.json['filename']
-    ret = cross_validate_m1_with_prune(filename,minsup,minconf)
+    ret = cba_m1_prune(filename,minsup,minconf)
     return jsonify(ret)
 @app.route('/cbaapr', methods=['POST'])
 def get_cbaapr():
@@ -70,8 +68,7 @@ def get_cbam2():
     minsup = request.json['minsup']
     minconf = request.json['minconf']
     filename = request.json['filename']
-    ret = cross_validate_m2_with_prune(filename,minsup,minconf)
-    print(2)
+    ret = cba_m2_prune(filename,minsup,minconf)
     return jsonify(ret)
 
 
@@ -83,6 +80,19 @@ def get_cmar():
     ret = get_cmar_result(filename, minsup, minconf)
     converted_ret = convert_sets_to_lists(ret)
     return jsonify(converted_ret)
+
+@app.route('/test',methods=['POST'])
+def get_test():
+    ret = []
+    minsup = request.json['minsup']
+    minconf = request.json['minconf']
+    filename = request.json['filename']
+    ret.append(cross_validate_m1(filename, minsup, minconf))
+    ret.append(cross_validate_m2(filename, minsup, minconf))
+    ret.append(cross_validate_apr(filename, minsup, minconf))
+    ret.append(cross_validate_cmar(filename, minsup, minconf))
+    print(ret)
+    return jsonify(ret)
 
 
 if __name__ == '__main__':

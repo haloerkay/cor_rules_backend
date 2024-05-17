@@ -7,17 +7,32 @@ from server.APR.pre_processing import pre_process
 from server.APR.read import read
 from server.APR.validation import acc
 
-
 def get_accuracy(classifier, dataset):
     size = len(dataset)
-    correct_number = 0
+    correct_match = 0
+    error_number = 0
     for case in dataset:
+        is_satisfy_value = False
         for rule in classifier.rule_list:
             is_satisfy_value = is_satisfy(case, rule)
-            if is_satisfy_value or classifier.default_class == case[-1]:
-                correct_number += 1
+            #print(is_satisfy_value)
+            if is_satisfy_value == True:
+                correct_match += 1
                 break
-    return correct_number / size
+        if is_satisfy_value == False:
+            error_number += 1
+    return correct_match / (error_number + correct_match)
+
+# def get_accuracy(classifier, dataset):
+#     size = len(dataset)
+#     correct_number = 0
+#     for case in dataset:
+#         for rule in classifier.rule_list:
+#             is_satisfy_value = is_satisfy(case, rule)
+#             if is_satisfy_value or classifier.default_class == case[-1]:
+#                 correct_number += 1
+#                 break
+#     return correct_number / size
 
 def apr(file, minsup, minconf):
     data, attributes, value_type = read('./dataset/' + file + '.csv')
@@ -58,14 +73,67 @@ def apr(file, minsup, minconf):
     # print(res,classifier.all_rules,cost)
 
     return {'accuracy': accuracy, 'cost': cost, 'rules': classifier.all_rules,'default':classifier.default_class}
+def cross_validate_apr(file, minsup, minconf):
+    data, attributes, value_type = read('./dataset/' + file + '.csv')
+    random.shuffle(data)
+    dataset = pre_process(data, attributes, value_type)
+
+    block_size = int(len(dataset) / 10)
+    split_point = [k * block_size for k in range(0, 10)]
+    split_point.append(len(dataset))
+
+    total_time = 0
+    total_car_number = 0
+    total_classifier_rule_num = 0
+    total_accuracy = 0
+    for k in range(len(split_point)-1):
+        print("\nRound %d:" % k)
+
+        training_dataset = dataset[:split_point[k]] + dataset[split_point[k+1]:]
+        test_dataset = dataset[split_point[k]:split_point[k+1]]
+
+        start_time = time.time()
+        cars = rule_generator(training_dataset, minsup, minconf)
 
 
+        arr=list(cars.rules_list)
+        max=-1
 
-# if __name__ == "__main__":
-#     # using the relative path, all data sets are stored in datasets directory
-#     file = 'iris.csv'
-#
-#     # just choose one mode to experiment by removing one line comment and running
-#     min_support=0.01
-#     min_conf=0.5
-#     apr(file,min_support,min_conf)
+        for i in range(len(arr)):
+            if len(arr[i].cond_set)>max:
+                max=len(arr[i].cond_set)
+        T=[[] for i in range(max)]
+        for i in range(len(arr)):
+            T[len(arr[i].cond_set)-1].append(arr[i])
+        u=[]
+        for i in range(len(T)):
+            T[i]=sort_dict(T[i])
+
+            for j in T[i]:
+                u.append(j)
+        classifier= classifier_builder_m1(cars, training_dataset,minsup,len(training_dataset),u)
+
+        end_time = time.time()
+        total_time += end_time - start_time
+
+        classifier.print()
+        accuracy = get_accuracy(classifier, test_dataset)
+        total_accuracy += accuracy
+
+        total_car_number += len(cars.rules)
+        # yuanlaide
+        total_classifier_rule_num += len(classifier.rule_list)
+        # xiugaide
+        # total_classifier_rule_num += len(classifier.all_rules)
+
+    accuracy = total_accuracy / 10 *100
+    total_rules = total_classifier_rule_num / 10
+    cost = total_time / 10
+    return {'accuracy': round(accuracy,3), 'num_rules': total_rules, 'cost':round(cost,4)}
+    #
+    # print("\n Average APR's accuracy :",(acc_total/10*100))
+    # print("Average No. of CARs : ",(total_car_number / 10))
+    # print("Average apr-RG's run time : " ,(apr_rg_total_runtime / 10))
+    # print("Average apr-CB run time :  " ,(apr_cb_total_runtime / 10))
+    # print("Average No. of rules in classifier of apr: " ,(total_classifier_rule_num / 10))
+

@@ -42,7 +42,7 @@ class RuleEntry:
             # itemStr += str(item) + ' '
             front = item
         arr = [front,self.label,round(self.support,3),round(self.confidence,3)]
-        print(arr,123)
+        # print(arr,123)
         return arr
         # print(itemStr, '-> ', self.label, self.support, self.confidence)
 
