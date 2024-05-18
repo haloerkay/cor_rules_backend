@@ -1,36 +1,20 @@
-"""
-Description: The implementation of a naive algorithm for CBA-CB: M1. The class Classifier includes the set of selected
-    rules and default_class, which can be expressed as <r1, r2, ..., rn, default_class>. Method classifier_builder_m1
-    is the main method to implement CBA-CB: M1.
-Input: a set of CARs generated from rule_generator (see cab_rg.py) and a dataset got from pre_process
-    (see pre_processing.py)
-Output: a classifier
-Author: CBA Studio
-Reference: http://www.docin.com/p-586554186.html
-"""
-import server.CBANB.cba_rg
-from functools import cmp_to_key
+
 import sys
+from functools import cmp_to_key
 
-
-# check the rule whether covers the data case (a line in table with the class label at the end of list) or not
-# if covers (LHS of rule is the same as the data case, and they belongs to the same class), return True;
-# else if LHSs are the same while the class labels are different, return False;
-# else (LHSs are different), return None
 def is_satisfy(datacase, rule):
-    for item in rule.cond_set:
-        if datacase[item] != rule.cond_set[item]:
-            return None
-    if datacase[-1] == rule.class_label:
-        return True
-    else:
-        return False
 
+    for item in rule.condition_set:
+        if datacase[item] == rule.condition_set[item]:
+            continue
+        return
+    last_index = len(datacase)-1
+    if datacase[last_index] != rule.class_label:
+        return False
+    return True
 
 class Classifier:
-    """
-    This class is our classifier. The rule_list and default_class are useful for outer code.
-    """
+
     def __init__(self):
         self.rule_list = list()
         self.default_class = None
@@ -40,67 +24,65 @@ class Classifier:
         self.all_rules = []
 
 
-    # insert a rule into rule_list, then choose a default class, and calculate the errors (see line 8, 10 & 11)
     def insert(self, rule, dataset):
-        self.rule_list.append(rule)             # insert r at the end of C
-        self._select_default_class(dataset)     # select a default class for the current C
-        self._compute_error(dataset)            # compute the total number of errors of C
 
-    # select the majority class in the remaining data
-    def _select_default_class(self, dataset):
-        class_column = [x[-1] for x in dataset]
-        class_label = set(class_column)
-        max = 0
-        current_default_class = None
-        for label in class_label:
-            if class_column.count(label) >= max:
-                max = class_column.count(label)
-                current_default_class = label
-        self._default_class_list.append(current_default_class)
+        self.rule_list.append(rule)
 
-    # compute the sum of errors
-    def _compute_error(self, dataset):
+
+        col = []
+        for row in dataset:
+            col.append(row[-1])
+        labels = set(col)
+        max_count = 0
+        current_default = None
+        for l in labels:
+            label_count = col.count(l)
+            if label_count >= max_count:
+                current_default = l
+        self._default_class_list.append(current_default)
+
+
+        self._calc_error(dataset)
+
+
+    def _calc_error(self, dataset):
         if len(dataset) <= 0:
             self._error_list.append(sys.maxsize)
             return
+        else:
+            error_number = 0
 
-        error_number = 0
+            for case in dataset:
+                is_cover = False
+                for rule in self.rule_list:
+                    if is_satisfy(case, rule):
+                        is_cover = True
+                        break
+                if not is_cover:
+                    error_number += 1
 
-        # the number of errors that have been made by all the selected rules in C
-        for case in dataset:
-            is_cover = False
-            for rule in self.rule_list:
-                if is_satisfy(case, rule):
-                    is_cover = True
-                    break
-            if not is_cover:
-                error_number += 1
+            class_column = [x[-1] for x in dataset]
+            error_number += len(class_column) - class_column.count(self._default_class_list[-1])
+            self._error_list.append(error_number)
 
-        # the number of errors to be made by the default class in the training set
-        class_column = [x[-1] for x in dataset]
-        error_number += len(class_column) - class_column.count(self._default_class_list[-1])
-        self._error_list.append(error_number)
 
-    # see line 14 and 15, to get the final classifier
-    def discard(self):
-        # find the first rule p in C with the lowest total number of errors and drop all the rules after p in C
+    def drop_rules(self):
+
         index = self._error_list.index(min(self._error_list))
         self.rule_list = self.rule_list[:(index+1)]
         self._error_list = None
 
-        # assign the default class associated with p to default_class
+
         self.default_class = self._default_class_list[index]
         self._default_class_list = None
 
-    # just print out all selected rules and default class in our classifier
+
     def print(self):
-        for rule in self.rule_list:
-            rule.print_rule()
-            self.all_rules.append(rule.one_rule)
+        for r in self.rule_list:
+            r.print_rule()
+            self.all_rules.append(r.one_rule)
         print("default_class:", self.default_class)
 
-
-# sort the set of generated rules car according to the relation ">", return the sorted rule list
 def sort(car):
     def cmp_method(a, b):
         if a.confidence < b.confidence:     # 1. the confidence of ri > rj
@@ -109,9 +91,9 @@ def sort(car):
             if a.support < b.support:       # 2. their confidences are the same, but support of ri > rj
                 return 1
             elif a.support == b.support:
-                if len(a.cond_set) < len(b.cond_set):   # 3. both confidence & support are the same, ri earlier than rj
+                if len(a.condition_set) < len(b.condition_set):   # 3. both confidence & support are the same, ri earlier than rj
                     return -1
-                elif len(a.cond_set) == len(b.cond_set):
+                elif len(a.condition_set) == len(b.condition_set):
                     return 0
                 else:
                     return 1
@@ -125,20 +107,104 @@ def sort(car):
     return rule_list
 
 
-# main method of CBA-CB: M1
+def SortRuleList(arr):
+
+    lenArr = len(arr)
+
+    if lenArr > 1:
+
+        mid = lenArr//2
+
+        right = arr[mid:]
+        left = arr[:mid]
+
+        SortRuleList(right)
+        SortRuleList(left)
+
+        index2 = index3 = index1 = 0
+
+        while index2 < len(right) and index1 < len(left):
+
+            a , b = left[index1] , right[index2]
+
+            confidence_a = a.confidence
+            confidence_b = b.confidence
+            confidence_difference = confidence_a - confidence_b
+
+            if confidence_difference > 0:
+                index1 += 1
+                arr[index3] = left[index1-1]
+
+
+            elif confidence_difference == 0:
+                support_a = a.support
+                support_b = b.support
+                support_difference = support_a - support_b
+
+                if support_difference > 0:
+                    arr[index3] = left[index1]
+                    index1 += 1
+
+                elif support_difference == 0:
+                    if len(a.condition_set) > len(b.condition_set):
+                        index1 += 1
+                        arr[index3] = left[index1-1]
+
+                    else:
+                        index2 += 1
+                        arr[index3] = right[index2-1]
+
+                else:
+                    index2 += 1
+                    arr[index3] = right[index2-1]
+
+            else:
+                index2 += 1
+                arr[index3] = right[index2-1]
+
+
+            index3 += 1
+
+        while index1 < len(left):
+            index3 += 1
+            index1 += 1
+            arr[index3-1] = left[index1-1]
+
+
+        while index2 < len(right):
+            index3 += 1
+            index2 += 1
+            arr[index3-1] = right[index2-1]
+    else:
+        pass
+
+
+
+
 def classifier_builder_m1(cars, dataset):
+
+
     classifier = Classifier()
-    cars_list = sort(cars)
+    rule_list = list(cars.rules)
+
+
+    SortRuleList(rule_list)
+
+
+    cars_list=rule_list
+
     for rule in cars_list:
+
         temp = []
-        mark = False
-        for i in range(len(dataset)):
-            is_satisfy_value = is_satisfy(dataset[i], rule)
+        marked = False
+        for index1 in range(len(dataset)):
+
+            is_satisfy_value = is_satisfy(dataset[index1], rule)
             if is_satisfy_value is not None:
-                temp.append(i)
+                temp.append(index1)
                 if is_satisfy_value:
-                    mark = True
-        if mark:
+                    marked = True
+        if marked:
             temp_dataset = list(dataset)
             for index in temp:
                 temp_dataset[index] = []
@@ -146,7 +212,7 @@ def classifier_builder_m1(cars, dataset):
                 temp_dataset.remove([])
             dataset = temp_dataset
             classifier.insert(rule, dataset)
-    classifier.discard()
-    return classifier
 
+    classifier.drop_rules()
+    return classifier
 

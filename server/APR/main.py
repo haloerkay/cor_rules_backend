@@ -7,21 +7,47 @@ from server.APR.pre_processing import pre_process
 from server.APR.read import read
 from server.APR.validation import acc
 
-def get_accuracy(classifier, dataset):
-    size = len(dataset)
-    correct_match = 0
-    error_number = 0
-    for case in dataset:
-        is_satisfy_value = False
-        for rule in classifier.rule_list:
-            is_satisfy_value = is_satisfy(case, rule)
-            #print(is_satisfy_value)
-            if is_satisfy_value == True:
-                correct_match += 1
+# def get_accuracy(classifier, dataset):
+#     size = len(dataset)
+#     correct_match = 0
+#     error_number = 0
+#     for case in dataset:
+#         is_satisfy_value = False
+#         for rule in classifier.rule_list:
+#             is_satisfy_value = is_satisfy(case, rule)
+#             #print(is_satisfy_value)
+#             if is_satisfy_value == True:
+#                 correct_match += 1
+#                 break
+#         if is_satisfy_value == False:
+#             error_number += 1
+#     return correct_match / (error_number + correct_match)
+def get_accuracy(apr,test):
+    temp=[]
+    actual=[x[-1] for x in test]
+    count=0
+    for i in range(len(test)):
+        flag1=True
+        for j in range(len(apr.rule_list)):
+            flag=True
+            for item in apr.rule_list[j].condition_set:
+                if test[i][item]!=apr.rule_list[j].condition_set[item]:
+                    flag=False
+                    break
+            if flag:
+                temp.append(apr.rule_list[j].class_label)
+                if temp[-1]==actual[i]:
+                    count+=1
+                flag1=False
                 break
-        if is_satisfy_value == False:
-            error_number += 1
-    return correct_match / (error_number + correct_match)
+
+        if flag1:
+            temp.append(apr.default_class)
+            if temp[-1]==actual[i]:
+                count+=1
+
+    res=count/len(test)
+    return res
 
 # def get_accuracy(classifier, dataset):
 #     size = len(dataset)
@@ -45,15 +71,16 @@ def apr(file, minsup, minconf):
     test_dataset = dataset[train_size:]
 
     start_time = time.time()
+
     cars = rule_generator(training_dataset, minsup, minconf)
     arr=list(cars.rules_list)
     max=-1
     for i in range(len(arr)):
-        if len(arr[i].cond_set)>max:
-            max=len(arr[i].cond_set)
+        if len(arr[i].condition_set)>max:
+            max=len(arr[i].condition_set)
     T=[[] for i in range(max)]
     for i in range(len(arr)):
-        T[len(arr[i].cond_set)-1].append(arr[i])
+        T[len(arr[i].condition_set)-1].append(arr[i])
     u=[]
     for i in range(len(T)):
         T[i]=sort_dict(T[i])
@@ -61,9 +88,8 @@ def apr(file, minsup, minconf):
         for j in T[i]:
             u.append(j)
 
-    classifier = classifier_builder_m1(cars, training_dataset,minsup,len(training_dataset),u)
-    end_time = time.time()
-    cost = end_time - start_time
+    classifier = classifier_builder_m1(training_dataset,minsup,len(training_dataset),u)
+
 
     # 得到最终关联规则的方法:现在ruleitem类中获得一个完整的一维数组（one_rule）
     # 在classifier的for循环中得到完整的二维数组（all_rules）
@@ -71,8 +97,9 @@ def apr(file, minsup, minconf):
     classifier.print()
     accuracy = get_accuracy(classifier,test_dataset)
     # print(res,classifier.all_rules,cost)
-
-    return {'accuracy': accuracy, 'cost': cost, 'rules': classifier.all_rules,'default':classifier.default_class}
+    end_time = time.time()
+    cost = end_time - start_time
+    return {'accuracy': accuracy, 'cost': cost, 'rules': classifier.all_rules}
 def cross_validate_apr(file, minsup, minconf):
     data, attributes, value_type = read('./dataset/' + file + '.csv')
     random.shuffle(data)
@@ -100,24 +127,26 @@ def cross_validate_apr(file, minsup, minconf):
         max=-1
 
         for i in range(len(arr)):
-            if len(arr[i].cond_set)>max:
-                max=len(arr[i].cond_set)
+            if len(arr[i].condition_set)>max:
+                max=len(arr[i].condition_set)
         T=[[] for i in range(max)]
         for i in range(len(arr)):
-            T[len(arr[i].cond_set)-1].append(arr[i])
+            T[len(arr[i].condition_set)-1].append(arr[i])
         u=[]
         for i in range(len(T)):
             T[i]=sort_dict(T[i])
 
             for j in T[i]:
                 u.append(j)
-        classifier= classifier_builder_m1(cars, training_dataset,minsup,len(training_dataset),u)
+        classifier= classifier_builder_m1(training_dataset,minsup,len(training_dataset),u)
 
-        end_time = time.time()
-        total_time += end_time - start_time
+
 
         classifier.print()
         accuracy = get_accuracy(classifier, test_dataset)
+        end_time = time.time()
+        total_time += end_time - start_time
+
         total_accuracy += accuracy
 
         total_car_number += len(cars.rules)

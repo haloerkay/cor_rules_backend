@@ -67,7 +67,7 @@ class Rule(ruleitem.RuleItem):
 
 # convert ruleitem of class RuleItem to rule of class Rule
 def ruleitem2rule(rule_item, dataset):
-    rule = Rule(rule_item.cond_set, rule_item.class_label, dataset)
+    rule = Rule(rule_item.condition_set, rule_item.class_label, dataset)
     return rule
 
 
@@ -107,9 +107,9 @@ def compare(rule1, rule2):
         if rule1.support < rule2.support:       # 2. their confidences are the same, but support of ri > rj
             return -1
         elif rule1.support == rule2.support:
-            if len(rule1.cond_set) < len(rule2.cond_set):   # 3. confidence & support are the same, ri earlier than rj
+            if len(rule1.condition_set) < len(rule2.condition_set):   # 3. confidence & support are the same, ri earlier than rj
                 return 1
-            elif len(rule1.cond_set) == len(rule2.cond_set):
+            elif len(rule1.condition_set) == len(rule2.condition_set):
                 return 0
             else:
                 return -1
@@ -161,9 +161,9 @@ def sort_with_index(q, cars_list):
                 return 1
             elif cars_list[a].support == cars_list[b].support:
                 # 3. both confidence & support are the same, ri earlier than rj
-                if len(cars_list[a].cond_set) < len(cars_list[b].cond_set):
+                if len(cars_list[a].condition_set) < len(cars_list[b].condition_set):
                     return -1
-                elif len(cars_list[a].cond_set) == len(cars_list[b].cond_set):
+                elif len(cars_list[a].condition_set) == len(cars_list[b].condition_set):
                     return 0
                 else:
                     return 1

@@ -1,64 +1,91 @@
 
+
 class RuleItem:
 
-    def __init__(self, cond_set, class_label, dataset):
-        self.cond_set = cond_set
-        self.class_label = class_label
-        self.cond_sup_count, self.rule_sup_count = self._get_sup_count(dataset)
-        self.support = self._get_support(len(dataset))
-        self.confidence = self._get_confidence()
+    def __init__(self, condition_set, label, data):
+        self.class_label = label
+        self.condition_set = condition_set
+        temp1 ,temp2 = self._find_count_for_support(data)
+        self.support_count = temp2
+        self.condition_support = temp1
+        len_dataset = len(data)
+        confidence = self._confidence()
+        self.confidence = confidence
+        support = self._support(len_dataset)
+        self.support = support
 
         self.one_rule = []
 
 
-    # calculate condsupCount and rulesupCount
-    def _get_sup_count(self, dataset):
-        cond_sup_count = 0
-        rule_sup_count = 0
-        for case in dataset:
-            is_contained = True
-            for index in self.cond_set:
-                if self.cond_set[index] != case[index]:
-                    is_contained = False
+    def _find_count_for_support(self, records):
+        initial_value = 0
+        support_count = condition_support = initial_value
+        flag = 1
+        increment = 1
+        for case in records:
+
+            for index in self.condition_set:
+                if self.condition_set[index] == case[index]:
+                    pass
+                else:
+                    flag = 0
                     break
-            if is_contained:
-                cond_sup_count += 1
-                if self.class_label == case[-1]:
-                    rule_sup_count += 1
-        return cond_sup_count, rule_sup_count
 
-    # calculate support count
-    def _get_support(self, dataset_size):
-        return self.rule_sup_count / dataset_size
+            if(flag != 1):
+                pass
+            else:
 
-    # calculate confidence
-    def _get_confidence(self):
-        if self.cond_sup_count != 0:
-            return self.rule_sup_count / self.cond_sup_count
-        else:
+                condition_support = condition_support + increment
+                last_index = len(case) - 1
+
+                if self.class_label != case[last_index]:
+                    pass
+                else:
+                    support_count += 1
+
+            flag = 1
+        return condition_support, support_count
+
+
+    def _support(self, size_of_records):
+        rule_support_count = self.support_count
+        size_of_dataset = size_of_records
+        result = rule_support_count / size_of_dataset
+        return result
+
+
+    def _confidence(self):
+        condition_support_count = self.condition_support
+        rule_support_count = self.support_count
+        initial_value = 0
+        if(condition_support_count == 0):
             return 0
 
-    # print out the ruleitem
-    def print(self):
-        cond_set_output = ''
-        for item in self.cond_set:
+        answer = rule_support_count / condition_support_count
 
-            cond_set_output += '(' + str(item) + ', ' + str(self.cond_set[item]) + '), '
-        cond_set_output = cond_set_output[:-2]
-        print('<({' + cond_set_output + '}, ' + str(self.cond_sup_count) + '), (' +
-              '(class, ' + str(self.class_label) + '), ' + str(self.rule_sup_count) + ')>')
+        if(condition_support_count == initial_value):
+            return initial_value
 
-    # print out rule
+        elif(condition_support_count != initial_value):
+            return answer
+
+
     def print_rule(self):
-        cond_set_output = ''
+        temp_index = -2
+        cond_set_output = '['
+        square_bracket_close = ']'
+        arrow = ' -> '
+        closing_bracket = ')'
         my_dict = {}
-        for item in self.cond_set:
-            my_dict[str(item)] = self.cond_set[item]
-            # print(item, self.cond_set[item],self.class_label,5)
-            # cond_set_output += '(' + str(item) + ', ' + str(self.cond_set[item]) + '), '
-        # cond_set_output = '{' + cond_set_output[:-2] + '}'
-        self.one_rule = [my_dict,self.class_label,round(self.support,3),round(self.confidence,3)]
-        # print(cond_set_output + ' -> (class, ' + str(self.class_label) + ')')
+        for element in self.condition_set:
+            cond_set_output += '(' + str(element) + ', ' + str(self.condition_set[element]) + '), '
+            my_dict[str(element)] = self.condition_set[element]
 
+        self.one_rule = [my_dict,str(self.class_label),round(self.support_count,3),self.confidence]
+        element = cond_set_output[:temp_index]
+        cond_set_output = cond_set_output[:temp_index]
+        cond_set_output = cond_set_output + square_bracket_close
+        label = str(self.class_label)
+        print(cond_set_output + arrow + '(class_label, ' + label+ closing_bracket)
 
 

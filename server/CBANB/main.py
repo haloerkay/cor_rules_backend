@@ -8,21 +8,47 @@ from server.CBANB.cba_cb_m1 import is_satisfy
 from server.CBANB.cba_cb_m2 import classifier_builder_m2
 import time
 import random
-def get_accuracy(classifier, dataset):
-    size = len(dataset)
-    correct_match = 0
-    error_number = 0
-    for case in dataset:
-        is_satisfy_value = False
-        for rule in classifier.rule_list:
-            is_satisfy_value = is_satisfy(case, rule)
-            #print(is_satisfy_value)
-            if is_satisfy_value == True:
-                correct_match += 1
+# def get_accuracy(classifier, dataset):
+#     size = len(dataset)
+#     correct_match = 0
+#     error_number = 0
+#     for case in dataset:
+#         is_satisfy_value = False
+#         for rule in classifier.rule_list:
+#             is_satisfy_value = is_satisfy(case, rule)
+#             #print(is_satisfy_value)
+#             if is_satisfy_value == True:
+#                 correct_match += 1
+#                 break
+#         if is_satisfy_value == False:
+#             error_number += 1
+#     return correct_match / (error_number + correct_match)
+def get_accuracy(apr,test):
+    temp=[]
+    actual=[x[-1] for x in test]
+    count=0
+    for i in range(len(test)):
+        flag1=True
+        for j in range(len(apr.rule_list)):
+            flag=True
+            for item in apr.rule_list[j].condition_set:
+                if test[i][item]!=apr.rule_list[j].condition_set[item]:
+                    flag=False
+                    break
+            if flag:
+                temp.append(apr.rule_list[j].class_label)
+                if temp[-1]==actual[i]:
+                    count+=1
+                flag1=False
                 break
-        if is_satisfy_value == False:
-            error_number += 1
-    return correct_match / (error_number + correct_match)
+
+        if flag1:
+            temp.append(apr.default_class)
+            if temp[-1]==actual[i]:
+                count+=1
+
+    res=count/len(test)
+    return res
 
 # def get_accuracy(classifier, dataset):
 #     size = len(dataset)
@@ -63,15 +89,16 @@ def cba_m1_prune(file, minsup, minconf):
     start_time = time.time()
     cars = rule_generator(training_dataset, minsup, minconf)
     classifier_m1 = classifier_builder_m1(cars, training_dataset)
-    end_time = time.time()
-    cost = end_time - start_time
+
 
     cars.prune_rules(training_dataset)
     cars.rules = cars.pruned_rules
     classifier_m1.print()
     accuracy = get_accuracy(classifier_m1, test_dataset)
+    end_time = time.time()
+    cost = end_time - start_time
 
-    cars.print_pruned_rule(minsup, minconf)
+    # cars.print_pruned_rule()
     # all_rules = cars.all_rules
     all_rules = classifier_m1.all_rules
     return {'accuracy': accuracy, 'cost': cost,'rules': all_rules}
@@ -101,14 +128,15 @@ def cross_validate_m1(file, minsup, minconf):
         cars.prune_rules(training_dataset)
         cars.rules = cars.pruned_rules
 
-        cars.print_pruned_rule(minsup, minconf)
-        print(cars.all_rules)
+        cars.print_pruned_rule()
+        # print(cars.all_rules)
 
         classifier_m1 = classifier_builder_m1(cars, training_dataset)
-        end_time = time.time()
-        total_time += end_time - start_time
+
 
         accuracy = get_accuracy(classifier_m1, test_dataset)
+        end_time = time.time()
+        total_time += end_time - start_time
         accuracy_total += accuracy
 
         total_car_number += len(cars.rules)
@@ -139,15 +167,16 @@ def cba_m2_prune(file, minsup, minconf):
     start_time = time.time()
     cars = rule_generator(training_dataset, minsup, minconf)
     classifier_m2 = classifier_builder_m2(cars, training_dataset)
-    end_time = time.time()
-    cost = end_time-start_time
+
 
     cars.prune_rules(training_dataset)
     cars.rules = cars.pruned_rules
     classifier_m2.print()
 
     accuracy = get_accuracy(classifier_m2, test_dataset)
-    cars.print_pruned_rule(minsup, minconf)
+    end_time = time.time()
+    cost = end_time-start_time
+    # cars.print_pruned_rule()
     # all_rules = cars.all_rules
     all_rules = classifier_m2.all_rules
     print(len(classifier_m2.rule_list),len(all_rules))
@@ -178,15 +207,16 @@ def cross_validate_m2(file, minsup, minconf):
         cars.prune_rules(training_dataset)
         cars.rules = cars.pruned_rules
 
-        cars.print_pruned_rule(minsup, minconf)
-        print(cars.all_rules)
+        cars.print_pruned_rule()
+        # print(cars.all_rules)
 
 
         classifier_m2 = classifier_builder_m2(cars, training_dataset)
-        end_time = time.time()
-        total_time += end_time - start_time
+
 
         accuracy = get_accuracy(classifier_m2, test_dataset)
+        end_time = time.time()
+        total_time += end_time - start_time
         accuracy_total += accuracy
 
         total_car_number += len(cars.rules)
