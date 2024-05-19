@@ -94,6 +94,7 @@ def cba_m1_prune(file, minsup, minconf):
     cars.prune_rules(training_dataset)
     cars.rules = cars.pruned_rules
     classifier_m1.print()
+    print(classifier_m1.default_class)
     accuracy = get_accuracy(classifier_m1, test_dataset)
     end_time = time.time()
     cost = end_time - start_time
@@ -101,7 +102,7 @@ def cba_m1_prune(file, minsup, minconf):
     # cars.print_pruned_rule()
     # all_rules = cars.all_rules
     all_rules = classifier_m1.all_rules
-    return {'accuracy': accuracy, 'cost': cost,'rules': all_rules}
+    return {'accuracy': accuracy, 'cost': cost,'rules': all_rules,'default': classifier_m1.default_class,'nums':len(all_rules)}
 
 def cross_validate_m1(file, minsup, minconf):
     data, attributes, value_type = read('./dataset/' + file + '.csv')
@@ -180,7 +181,7 @@ def cba_m2_prune(file, minsup, minconf):
     # all_rules = cars.all_rules
     all_rules = classifier_m2.all_rules
     print(len(classifier_m2.rule_list),len(all_rules))
-    return {'accuracy': accuracy, 'cost': cost,'rules': all_rules}
+    return {'accuracy': accuracy, 'cost': cost,'rules': all_rules,'default':classifier_m2.default_class,'nums':len(all_rules)}
 
 def cross_validate_m2(file, minsup, minconf):
     data, attributes, value_type = read('./dataset/' + file + '.csv')

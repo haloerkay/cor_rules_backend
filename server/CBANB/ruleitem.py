@@ -81,7 +81,7 @@ class RuleItem:
             cond_set_output += '(' + str(element) + ', ' + str(self.condition_set[element]) + '), '
             my_dict[str(element)] = self.condition_set[element]
 
-        self.one_rule = [my_dict,str(self.class_label),round(self.support_count,3),self.confidence]
+        self.one_rule = [my_dict,str(self.class_label),round(self.support,3),round(self.confidence,3)]
         element = cond_set_output[:temp_index]
         cond_set_output = cond_set_output[:temp_index]
         cond_set_output = cond_set_output + square_bracket_close

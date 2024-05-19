@@ -131,7 +131,7 @@ def get_acc(classifier, dataentries: [DataEntry],attributes):
             error_count += 1
     # print(result_counter)
     # print("error count is", error_count)
-    return 1 - error_count/len(dataentries), rules
+    return 1 - error_count / len(dataentries), rules
 # get rules from dataset
 def get_rules(data, minSup,minConf):
     myFPtree, myHeaderTab = createFPtree(data, {}, minSup)

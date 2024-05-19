@@ -1,3 +1,4 @@
+import json
 import time
 
 from server.CMAR.CMAR_Classifier import *
@@ -64,9 +65,21 @@ def get_cmar_result(file,minSup,minConf):
     # print("rule number is ", len(tree_pruned_rules))
     # print(111,str(tree_pruned_rules))
     accuracy,rules = get_acc(classifier, test_dataset_to_feed,attributes)
+
+    seen = {}
+    result = []
+
+    for item in rules:
+        key = json.dumps(item[0])  # 将对象转换为字符串，作为字典的键
+        if key not in seen:
+            seen[key] = True
+            result.append(item)
+
+    rules = result
+
     # index_map = {value: index for index, value in enumerate(array1)}
     # print( {'accuracy': accuracy, 'cost': cost,'rules':rules })
-    return {'accuracy': accuracy, 'cost': cost,'rules':rules }
+    return {'accuracy': accuracy, 'cost': cost,'rules':rules,'default':classifier.default_label,'nums':len(rules)}
 
 def cross_validate_cmar(file,minSup,minConf):
     data, attributes, value_type = read('./dataset/' + file + '.csv')
@@ -109,6 +122,17 @@ def cross_validate_cmar(file,minSup,minConf):
         accuracy, rules = get_acc(classifier, test_dataset_to_feed, attributes)
         end = time.time()
         total_time = end - start
+
+        seen = {}
+        result = []
+
+        for item in rules:
+            key = json.dumps(item[0])  # 将对象转换为字符串，作为字典的键
+            if key not in seen:
+                seen[key] = True
+                result.append(item)
+
+        rules = result
 
         total_time = total_time + (end - start)
         total_acc += accuracy

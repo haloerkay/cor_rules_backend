@@ -99,7 +99,7 @@ def apr(file, minsup, minconf):
     # print(res,classifier.all_rules,cost)
     end_time = time.time()
     cost = end_time - start_time
-    return {'accuracy': accuracy, 'cost': cost, 'rules': classifier.all_rules}
+    return {'accuracy': accuracy, 'cost': cost, 'rules': classifier.all_rules,'default':classifier.default_class,'nums':len(classifier.all_rules)}
 def cross_validate_apr(file, minsup, minconf):
     data, attributes, value_type = read('./dataset/' + file + '.csv')
     random.shuffle(data)
