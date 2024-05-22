@@ -138,5 +138,5 @@ def cross_validate_cmar(file,minSup,minConf):
         total_acc += accuracy
         total_rules_nums += len(rules)
 
-    return {'accuracy': round(total_acc / 10 * 100,3), 'num_rules': total_rules_nums / 10, 'cost': round(total_time / 10,4)}
+    return {'accuracy': round(total_acc / 10 * 100,3), 'num_rules': total_rules_nums / 10, 'cost': round(total_time / 10,3)}
 # get_cmar_result('iris',0.01,0)

@@ -152,7 +152,8 @@ def cross_validate_m1(file, minsup, minconf):
     accuracy = accuracy_total / 10 * 100
     num_rules = int(total_classifier_rule_num) / 10
     cost = total_time / 10
-    return {'accuracy': round(accuracy,3), 'num_rules': num_rules, 'cost':round(cost,4)}
+    car_number = total_car_number / 10
+    return {'accuracy': round(accuracy,3), 'num_rules': num_rules, 'cost':round(cost,3)}
 
 
 def cba_m2_prune(file, minsup, minconf):
@@ -225,7 +226,7 @@ def cross_validate_m2(file, minsup, minconf):
     accuracy = accuracy_total / 10 * 100
     num_rules = int(total_classifier_rule_num) / 10
     cost = total_time / 10
-    return {'accuracy': round(accuracy,3), 'num_rules': num_rules, 'cost':round(cost,4)}
+    return {'accuracy': round(accuracy,3), 'num_rules': num_rules, 'cost':round(cost,3)}
 
 def get_preprocess(file):
     df = pd.read_csv('./dataset/' + file + '.csv')

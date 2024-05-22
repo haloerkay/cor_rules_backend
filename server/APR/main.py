@@ -158,7 +158,7 @@ def cross_validate_apr(file, minsup, minconf):
     accuracy = total_accuracy / 10 *100
     total_rules = total_classifier_rule_num / 10
     cost = total_time / 10
-    return {'accuracy': round(accuracy,3), 'num_rules': total_rules, 'cost':round(cost,4)}
+    return {'accuracy': round(accuracy,3), 'num_rules': total_rules, 'cost':round(cost,3)}
     #
     # print("\n Average APR's accuracy :",(acc_total/10*100))
     # print("Average No. of CARs : ",(total_car_number / 10))

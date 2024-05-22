@@ -149,20 +149,15 @@ def SortRuleList(arr):
                     if len(a.condition_set) > len(b.condition_set):
                         index1 += 1
                         arr[index3] = left[index1-1]
-
                     else:
                         index2 += 1
                         arr[index3] = right[index2-1]
-
                 else:
                     index2 += 1
                     arr[index3] = right[index2-1]
-
             else:
                 index2 += 1
                 arr[index3] = right[index2-1]
-
-
             index3 += 1
 
         while index1 < len(left):
@@ -178,27 +173,17 @@ def SortRuleList(arr):
     else:
         pass
 
-
-
-
 def classifier_builder_m1(cars, dataset):
-
 
     classifier = Classifier()
     rule_list = list(cars.rules)
-
-
     SortRuleList(rule_list)
-
-
     cars_list=rule_list
 
     for rule in cars_list:
-
         temp = []
         marked = False
         for index1 in range(len(dataset)):
-
             is_satisfy_value = is_satisfy(dataset[index1], rule)
             if is_satisfy_value is not None:
                 temp.append(index1)
