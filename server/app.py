@@ -1,8 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
-import time
-# from CBA_new.main import get_cba_result,get_preprocess
 from CMAR.main import get_cmar_result,cross_validate_cmar
 from CBANB.main import cba_m1_prune,cba_m2_prune,get_preprocess,cross_validate_m1,cross_validate_m2
 from server.APR.main import apr,cross_validate_apr
@@ -28,14 +26,6 @@ def get_pre_process(file):
    ret = get_preprocess(file)
    return jsonify(ret)
 
-
-# @app.route('/cba', methods=['POST'])
-# def get_cba():
-#     minsup = request.json['minsup']
-#     minconf = request.json['minconf']
-#     filename = request.json['filename']
-#     ret = get_cba_result(minsup,minconf,filename)
-#     return jsonify(ret)
 def convert_sets_to_lists(obj):
     if isinstance(obj, set):
         return list(obj)
@@ -46,7 +36,6 @@ def convert_sets_to_lists(obj):
     else:
         return obj
 
-# 在函数中使用转换
 
 @app.route('/cbam1', methods=['POST'])
 def get_cbam1():

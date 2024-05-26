@@ -1,9 +1,7 @@
 import json
-import time
 
 from server.CMAR.CMAR_Classifier import *
 from server.CMAR.CR_Tree import *
-from server.CMAR.FP_Tree import *
 from server.CMAR.cbaLib.pre_processing import *
 from server.CMAR.cbaLib.validation import *
 from server.CMAR.CMAR_Classifier import get_acc
@@ -17,7 +15,6 @@ def str2numerical(data, value_type):
                 data[i][j] = float(data[i][j])
     return data
 def read(data_path):
-    # data = read_data(data_path)
     df = pd.read_csv(data_path)
     data = df.values.tolist()
     attributes = df.columns.tolist()
@@ -58,27 +55,19 @@ def get_cmar_result(file,minSup,minConf):
     classifier = CMARClassifier(tree_pruned_rules, default_label, train_dataset_to_feed, len(train_dataset_to_feed))
     end = time.time()
     cost = end - start
-    # 原输出结果
-    # print('accuracy:', get_acc(classifier, test_dataset_to_feed))
-    # print(len(test_dataset_to_feed), len(train_dataset_to_feed))
-    # print('default class is', default_label)
-    # print("rule number is ", len(tree_pruned_rules))
-    # print(111,str(tree_pruned_rules))
     accuracy,rules = get_acc(classifier, test_dataset_to_feed,attributes)
 
     seen = {}
     result = []
 
     for item in rules:
-        key = json.dumps(item[0])  # 将对象转换为字符串，作为字典的键
+        key = json.dumps(item[0])
         if key not in seen:
             seen[key] = True
             result.append(item)
 
     rules = result
 
-    # index_map = {value: index for index, value in enumerate(array1)}
-    # print( {'accuracy': accuracy, 'cost': cost,'rules':rules })
     return {'accuracy': accuracy, 'cost': cost,'rules':rules,'default':classifier.default_label,'nums':len(rules)}
 
 def cross_validate_cmar(file,minSup,minConf):
@@ -127,7 +116,7 @@ def cross_validate_cmar(file,minSup,minConf):
         result = []
 
         for item in rules:
-            key = json.dumps(item[0])  # 将对象转换为字符串，作为字典的键
+            key = json.dumps(item[0])
             if key not in seen:
                 seen[key] = True
                 result.append(item)
@@ -139,4 +128,3 @@ def cross_validate_cmar(file,minSup,minConf):
         total_rules_nums += len(rules)
 
     return {'accuracy': round(total_acc / 10 * 100,3), 'num_rules': total_rules_nums / 10, 'cost': round(total_time / 10,3)}
-# get_cmar_result('iris',0.01,0)

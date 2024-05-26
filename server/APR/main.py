@@ -5,23 +5,7 @@ from server.APR.apr_cb_m1 import is_satisfy, sort_dict, classifier_builder_m1
 from server.APR.apr_rg import rule_generator
 from server.APR.pre_processing import pre_process
 from server.APR.read import read
-from server.APR.validation import acc
 
-# def get_accuracy(classifier, dataset):
-#     size = len(dataset)
-#     correct_match = 0
-#     error_number = 0
-#     for case in dataset:
-#         is_satisfy_value = False
-#         for rule in classifier.rule_list:
-#             is_satisfy_value = is_satisfy(case, rule)
-#             #print(is_satisfy_value)
-#             if is_satisfy_value == True:
-#                 correct_match += 1
-#                 break
-#         if is_satisfy_value == False:
-#             error_number += 1
-#     return correct_match / (error_number + correct_match)
 def get_accuracy(apr,test):
     temp=[]
     actual=[x[-1] for x in test]
@@ -49,17 +33,6 @@ def get_accuracy(apr,test):
     res=count/len(test)
     return res
 
-# def get_accuracy(classifier, dataset):
-#     size = len(dataset)
-#     correct_number = 0
-#     for case in dataset:
-#         for rule in classifier.rule_list:
-#             is_satisfy_value = is_satisfy(case, rule)
-#             if is_satisfy_value or classifier.default_class == case[-1]:
-#                 correct_number += 1
-#                 break
-#     return correct_number / size
-
 def apr(file, minsup, minconf):
     data, attributes, value_type = read('./dataset/' + file + '.csv')
     dataset = pre_process(data, attributes, value_type)
@@ -69,9 +42,7 @@ def apr(file, minsup, minconf):
     random.shuffle(dataset)
     training_dataset = dataset[:train_size]
     test_dataset = dataset[train_size:]
-
     start_time = time.time()
-
     cars = rule_generator(training_dataset, minsup, minconf)
     arr=list(cars.rules_list)
     max=-1
@@ -89,14 +60,8 @@ def apr(file, minsup, minconf):
             u.append(j)
 
     classifier = classifier_builder_m1(training_dataset,minsup,len(training_dataset),u)
-
-
-    # 得到最终关联规则的方法:现在ruleitem类中获得一个完整的一维数组（one_rule）
-    # 在classifier的for循环中得到完整的二维数组（all_rules）
-    # 这个函数不能删，用于的到结果classifier.all_rules
     classifier.print()
     accuracy = get_accuracy(classifier,test_dataset)
-    # print(res,classifier.all_rules,cost)
     end_time = time.time()
     cost = end_time - start_time
     return {'accuracy': accuracy, 'cost': cost, 'rules': classifier.all_rules,'default':classifier.default_class,'nums':len(classifier.all_rules)}
@@ -108,7 +73,6 @@ def cross_validate_apr(file, minsup, minconf):
     block_size = int(len(dataset) / 10)
     split_point = [k * block_size for k in range(0, 10)]
     split_point.append(len(dataset))
-
     total_time = 0
     total_car_number = 0
     total_classifier_rule_num = 0
@@ -140,29 +104,17 @@ def cross_validate_apr(file, minsup, minconf):
                 u.append(j)
         classifier= classifier_builder_m1(training_dataset,minsup,len(training_dataset),u)
 
-
-
         classifier.print()
         accuracy = get_accuracy(classifier, test_dataset)
         end_time = time.time()
         total_time += end_time - start_time
 
         total_accuracy += accuracy
-
         total_car_number += len(cars.rules)
-        # yuanlaide
         total_classifier_rule_num += len(classifier.rule_list)
-        # xiugaide
-        # total_classifier_rule_num += len(classifier.all_rules)
-
     accuracy = total_accuracy / 10 *100
     total_rules = total_classifier_rule_num / 10
     cost = total_time / 10
     return {'accuracy': round(accuracy,3), 'num_rules': total_rules, 'cost':round(cost,3)}
-    #
-    # print("\n Average APR's accuracy :",(acc_total/10*100))
-    # print("Average No. of CARs : ",(total_car_number / 10))
-    # print("Average apr-RG's run time : " ,(apr_rg_total_runtime / 10))
-    # print("Average apr-CB run time :  " ,(apr_cb_total_runtime / 10))
-    # print("Average No. of rules in classifier of apr: " ,(total_classifier_rule_num / 10))
+
 
