@@ -68,18 +68,11 @@ class CMARClassifier:
 
     @staticmethod
     def chi_squared(precondition_count: int, label_count: int, support: int, datasize: int) -> (float, float):
-        # print('support (nAB) = ', support, " precond count = ", precondition_count)
-        # print('label count = ', label_count, " datasize = ", datasize)
-        # print('------------------------------------------------------')
-
         nAB = support
         n_notA_notB = datasize - (precondition_count + label_count) + support
         n_A_notB = precondition_count - support
         n_notA_B = label_count - support
-        # print("nAB = ", nAB, "nA'B' = ", n_notA_notB)
-        # print("nAB' = ", n_A_notB, " nA'B = ", n_notA_B)
         g, p, _, _ = chi2_contingency(np.array([[nAB, n_A_notB], [n_notA_B, n_notA_notB]]))
-        # not sure about what does these two mean: not checked documentation yet
         return g, p
 
     @staticmethod
@@ -105,9 +98,6 @@ class CMARClassifier:
         return sum
 
 
-
-
-# 原main.py文件中
 def convert_data_to_dataentry(l_data, attributes):
     items = []
     for index, i in enumerate(l_data[:-1]):
@@ -129,8 +119,7 @@ def get_acc(classifier, dataentries: [DataEntry],attributes):
         result_counter[result] += 1
         if result != label:
             error_count += 1
-    # print(result_counter)
-    # print("error count is", error_count)
+
     return 1 - error_count / len(dataentries), rules
 # get rules from dataset
 def get_rules(data, minSup,minConf):
